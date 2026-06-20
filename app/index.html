@@ -341,13 +341,16 @@
   .share-screen.show{display:flex}
   .share-screen-card{width:min(380px,100%);text-align:center}
   .share-screen-kicker{margin:0 0 10px;font-size:12.5px;color:var(--s-muted);letter-spacing:.02em}
-  .share-screen-title{margin:0 0 18px;font-family:var(--serif);font-size:clamp(20px,4.5vw,25px);font-weight:700;color:var(--s-text);line-height:1.4}
+  .share-screen-title{margin:0 0 12px;font-family:var(--serif);font-size:clamp(19px,4.2vw,24px);font-weight:700;color:var(--s-text);line-height:1.45;overflow-wrap:break-word;word-break:keep-all}
+  .share-screen-title .sg-doc{color:var(--s-primary)}
+  .share-screen-desc{margin:0 0 18px;font-size:13.5px;color:var(--s-muted);line-height:1.55}
   .share-name-input{width:100%;padding:13px 15px;font-size:15px;font-family:inherit;color:var(--s-text);background:var(--s-surface);border:1px solid var(--s-border);border-radius:12px;text-align:center;margin:0 0 12px}
   .share-name-input:focus{outline:2px solid var(--s-primary);outline-offset:1px;border-color:var(--s-primary)}
   .share-start-btn{width:100%;padding:13px;font-size:15px;font-weight:700;font-family:inherit;color:var(--s-primary-text);background:var(--s-primary);border:1px solid var(--s-primary);border-radius:12px;cursor:pointer;transition:filter .15s}
   .share-start-btn:hover{filter:brightness(1.06)}
   .share-start-btn:disabled{opacity:.5;cursor:default;filter:none}
-  .share-screen-foot{margin:16px 0 0;font-size:12px;color:var(--s-muted);line-height:1.6}
+  .share-screen-period{margin:14px 0 0;font-size:12.5px;color:var(--s-muted)}
+  .share-screen-foot{margin:10px 0 0;font-size:12px;color:var(--s-muted);line-height:1.6}
 
   /* 공유 뷰어 모드 — 작성자용 컨트롤 숨김 */
   body.share-mode #open-btn,
@@ -519,9 +522,11 @@
 <div class="share-screen" id="share-gate">
   <div class="share-screen-card">
     <p class="share-screen-kicker">비공개로 공유된 원고입니다</p>
-    <h2 class="share-screen-title">읽기 전에 성함을 남겨주세요</h2>
+    <h2 class="share-screen-title" id="share-by">원고를 공유받으셨습니다</h2>
+    <p class="share-screen-desc">아래에 공유받으신 분의 성함을 입력하시면 열람하실 수 있습니다.</p>
     <input class="share-name-input" id="share-name" placeholder="이름" autocomplete="name" maxlength="60">
     <button class="share-start-btn" id="share-start" disabled>읽기 시작</button>
+    <p class="share-screen-period" id="share-period-info" hidden></p>
     <p class="share-screen-foot">입력하신 이름과 접속 시각이 작성자에게 전달됩니다.</p>
   </div>
 </div>
@@ -1975,6 +1980,25 @@ function assemble(md){
   function getCookie(){ const m=document.cookie.match(new RegExp('(?:^|; )'+COOKIE.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'=([^;]*)')); return m?decodeURIComponent(m[1]):''; }
   function setCookie(name){ document.cookie=COOKIE+'='+encodeURIComponent(name)+'; max-age='+(60*60*24*30)+'; path=/; samesite=lax'; }
 
+  // 이름 입력 화면 안내 채우기 ([이메일]님이 「제목」을 공유했습니다 / 공개 기간)
+  const PERIOD_LABEL={'1w':'1주','2w':'2주','1m':'한 달','3m':'3달'};
+  function esc(s){ const d=document.createElement('div'); d.textContent=(s==null?'':s); return d.innerHTML; }
+  function objParticle(t){ const ch=(t||'').trim().slice(-1); const c=ch.charCodeAt(0);
+    if(c>=0xAC00 && c<=0xD7A3) return ((c-0xAC00)%28)?'을':'를'; return '를'; }   // 받침 있으면 을, 없으면/비한글 를
+  function fmtShareDate(iso){ try{ const d=new Date(iso); return d.getFullYear()+'. '+(d.getMonth()+1)+'. '+d.getDate()+'.'; }catch(_){ return ''; } }
+  function fillGate(meta){
+    if(meta && meta.title){
+      const who = meta.sharer ? esc(meta.sharer) : '어떤 분';
+      document.getElementById('share-by').innerHTML =
+        who+'님이 <span class="sg-doc">「'+esc(meta.title)+'」</span>'+objParticle(meta.title)+' 공유했습니다';
+    }
+    if(meta && meta.expires_at){
+      const per=document.getElementById('share-period-info'), lbl=PERIOD_LABEL[meta.period];
+      per.textContent='공개 기간'+(lbl?' · '+lbl:'')+' · '+fmtShareDate(meta.expires_at)+'까지';
+      per.hidden=false;
+    }
+  }
+
   if(!(sbLib && cfg && cfg.SUPABASE_URL && cfg.SUPABASE_ANON_KEY)){ showExpired(); return; }
   const sb=sbLib.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY, {auth:{persistSession:false}});
 
@@ -2000,6 +2024,7 @@ function assemble(md){
     const {data,error}=await sb.rpc('share_status',{p_token:token});
     hideLoading();
     if(error || !data || !data.ok){ showExpired(); return; }
+    fillGate(data);
     const saved=getCookie();
     if(saved) doEnter(saved); else showGate();
   })();
