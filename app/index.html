@@ -202,15 +202,15 @@
   .arrow,.nav-zone{display:none}
   body.doc-open .arrow{display:flex}
   body.doc-open .nav-zone{display:block}
-  #info-btn,#toc-btn,#type-btn,#trim-btn,#view-btn{display:none}
-  body.doc-open #info-btn,body.doc-open #toc-btn,body.doc-open #type-btn,body.doc-open #trim-btn,body.doc-open #view-btn{display:inline-flex}
+  #info-btn,#toc-btn,#display-btn{display:none}
+  body.doc-open #info-btn,body.doc-open #toc-btn,body.doc-open #display-btn{display:inline-flex}
   .loading{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:29;background:color-mix(in srgb,var(--stage) 80%,transparent)}
   .loading .spinner{width:34px;height:34px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--accent);animation:spin .8s linear infinite}
   .loading .lmsg{font-size:12.5px;color:var(--muted);letter-spacing:.06em}
   @keyframes spin{to{transform:rotate(360deg)}}
   .hidden{display:none!important}
   [hidden]{display:none!important}
-  @media (max-width:640px){.wordmark small{display:none}body.doc-open .arrow{display:none}.nav-zone{width:30%}.pop{left:8px!important;right:8px;min-width:0}.features{display:none}.land-sub{display:none}.land-mk{font-size:clamp(40px,12vw,60px)}}
+  @media (max-width:640px){.wordmark small{display:none}body.doc-open .arrow{display:none}.nav-zone{width:30%}.features{display:none}.land-sub{display:none}.land-mk{font-size:clamp(40px,12vw,60px)}}
   @media (max-height:540px){.land-sub{display:none}.features{display:none}}
   @media (prefers-reduced-motion:reduce){.flow,.progress .fill,.book{transition:none}.pop.open{animation:none}.viewport{scroll-behavior:auto}}
 
@@ -229,7 +229,7 @@
   .upload-toggle input:checked+.toggle-track{background:var(--accent)}
   .upload-toggle input:checked+.toggle-track::after{transform:translateX(14px)}
   body.dash-open .upload-toggle{display:inline-flex}
-  body.dash-open #info-btn,body.dash-open #toc-btn,body.dash-open #type-btn,body.dash-open #trim-btn,body.dash-open #view-btn{display:none!important}
+  body.dash-open #info-btn,body.dash-open #toc-btn,body.dash-open #display-btn{display:none!important}
   .dash-upload{width:100%;height:clamp(98px,16.8vh,175px);margin:0 0 22px}
   .dash-upload.dz-hot{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
   .dash-upload.disabled{opacity:.5;cursor:not-allowed}
@@ -362,6 +362,34 @@
   body.share-mode #user-chip{display:none!important}
   body.share-mode .wordmark{cursor:default;pointer-events:none}
   body.share-mode #empty{display:none!important}
+
+  /* ===== V1.1: 읽기 도구막대 — 접기/펴기(몰입) + 모바일 바텀시트 ===== */
+  /* 상단 바 접기/펴기 (읽는 중에만 노출되는 플로팅 버튼) */
+  .chrome-toggle{position:absolute;top:9px;right:11px;z-index:31;width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:color-mix(in srgb,var(--rail) 78%,transparent);color:var(--muted);cursor:pointer;display:none;align-items:center;justify-content:center;-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);transition:opacity .2s,border-color .15s,color .15s,background .2s}
+  .chrome-toggle:hover{border-color:var(--accent);color:var(--ink)}
+  .chrome-toggle svg{width:17px;height:17px;transition:transform .25s}
+  body.doc-open .chrome-toggle{display:flex}
+  body.pop-open .chrome-toggle{opacity:0;pointer-events:none}
+  body.chrome-hidden .rail{display:none}
+  body.chrome-hidden .chrome-toggle svg{transform:rotate(180deg)}
+  body.chrome-hidden .progress{opacity:0}
+  /* 통합 보기 패널: 폭 고정 + 길면 데스크탑에서도 스크롤 */
+  .pop-display{width:300px;max-height:calc(100vh - 72px);overflow:auto}
+  .pop-note{font-size:11.5px;color:var(--muted);margin:7px 0 2px;line-height:1.5}
+  /* 모바일: 설정 창을 하단 시트로 통일 (위치·크기 들쑥날쑥 해소) */
+  #pop-scrim{position:fixed;inset:0;z-index:39;background:rgba(0,0,0,.34);opacity:0;pointer-events:none;transition:opacity .2s}
+  @media (max-width:640px){
+    body.pop-open #pop-scrim{opacity:1;pointer-events:auto}
+    .pop{position:fixed!important;left:0!important;right:0!important;bottom:0!important;top:auto!important;width:auto!important;
+         min-width:0;max-height:80vh;overflow:auto;border-radius:18px 18px 0 0;padding:6px 18px 22px;
+         box-shadow:0 -22px 60px -18px var(--shadow)}
+    .pop.open{animation:sheet .24s cubic-bezier(.22,1,.36,1)}
+    .pop::before{content:"";display:block;width:40px;height:4px;border-radius:2px;background:var(--line);margin:6px auto 12px}
+    .pop h4{font-size:12px;margin-top:6px}
+    .row{margin:14px 0}
+    .toc-list{max-height:64vh}
+  }
+  @keyframes sheet{from{transform:translateY(100%)}to{transform:none}}
 </style>
 <script src="../config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -375,9 +403,7 @@
     <span class="spacer"></span>
     <button class="btn" id="info-btn" disabled title="정보"><span class="btn-ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.5"/><line x1="8" y1="7" x2="8" y2="11"/><circle cx="8" cy="5.2" r=".7" fill="currentColor" stroke="none"/></svg></span><span class="btn-label">정보</span></button>
     <button class="btn" id="toc-btn" disabled title="목차"><span class="btn-ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="2" y1="4" x2="14" y2="4"/><line x1="2" y1="8" x2="14" y2="8"/><line x1="2" y1="12" x2="10" y2="12"/></svg></span><span class="btn-label">목차</span></button>
-    <button class="btn" id="type-btn" disabled title="글꼴"><span class="btn-ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M2 3.5h12M8 3.5V13M5.5 13h5"/></svg></span><span class="btn-label">글꼴</span></button>
-    <button class="btn" id="trim-btn" disabled title="판형"><span class="btn-ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="1.5" width="11" height="13" rx="1.5"/><line x1="5" y1="5.5" x2="11" y2="5.5"/><line x1="5" y1="8" x2="11" y2="8"/><line x1="5" y1="10.5" x2="9" y2="10.5"/></svg></span><span class="btn-label">판형</span></button>
-    <button class="btn" id="view-btn" disabled title="보기"><span class="btn-ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x=".5" y="2" width="6.5" height="12" rx="1"/><rect x="9" y="2" width="6.5" height="12" rx="1"/></svg></span><span class="btn-label">보기</span></button>
+    <button class="btn" id="display-btn" disabled title="보기 설정 (글꼴·판형·쪽 배치)"><span class="btn-ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="2" y1="4.5" x2="14" y2="4.5"/><line x1="2" y1="11.5" x2="14" y2="11.5"/><circle cx="10.5" cy="4.5" r="2"/><circle cx="5.5" cy="11.5" r="2"/></svg></span><span class="btn-label">보기</span></button>
     <button class="btn" id="theme-btn" title="테마"><span class="btn-ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="8" cy="8" r="3"/><line x1="8" y1="1" x2="8" y2="2.5"/><line x1="8" y1="13.5" x2="8" y2="15"/><line x1="1" y1="8" x2="2.5" y2="8"/><line x1="13.5" y1="8" x2="15" y2="8"/><line x1="3.2" y1="3.2" x2="4.2" y2="4.2"/><line x1="11.8" y1="11.8" x2="12.8" y2="12.8"/><line x1="12.8" y1="3.2" x2="11.8" y2="4.2"/><line x1="4.2" y1="11.8" x2="3.2" y2="12.8"/></svg></span><span class="btn-label">테마</span></button>
     <button class="btn" id="login-btn" hidden>로그인</button>
     <button class="btn solid" id="signup-btn" hidden>회원가입</button>
@@ -390,6 +416,7 @@
     <button class="nav-zone right" id="zone-r" aria-label="다음"></button>
     <button class="arrow left" id="arr-l" aria-label="이전">‹</button>
     <button class="arrow right" id="arr-r" aria-label="다음">›</button>
+    <button class="chrome-toggle" id="chrome-toggle" aria-label="도구막대 접기·펴기" title="도구막대 접기"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10l4-4 4 4"/></svg></button>
 
     <div class="book" id="book" hidden>
       <div class="gutter"></div>
@@ -553,19 +580,16 @@
 
 <div class="pop" id="pop-toc" style="right:16px"><h4>목차</h4><ul class="toc-list" id="toc-list"></ul></div>
 
-<div class="pop" id="pop-type" style="right:16px">
+<div class="pop pop-display" id="pop-display" style="right:16px">
   <h4>글꼴</h4>
   <div class="row"><span class="lbl">서체</span><span class="seg" id="seg-font"><button data-font="serif" aria-pressed="true">명조</button><button data-font="sans" aria-pressed="false">고딕</button></span></div>
   <div class="row"><span class="lbl">글자 크기</span><span class="stepper"><button id="fs-dn">−</button><span class="val" id="fs-val">18</span><button id="fs-up">＋</button></span></div>
   <div class="row"><span class="lbl">행간</span><span class="stepper"><button id="lh-dn">−</button><span class="val" id="lh-val">1.85</span><button id="lh-up">＋</button></span></div>
-</div>
-
-<div class="pop" id="pop-trim" style="right:16px">
+  <div class="divider"></div>
   <h4>판형</h4>
-  <div class="row"><span class="lbl">모바일</span><span class="seg"><button data-trim="mobile" aria-pressed="false">세로</button></span></div>
-  <div class="row"><span class="lbl">문고본</span><span class="seg"><button data-trim="pocket" aria-pressed="false">A6</button></span></div>
-  <div class="row"><span class="lbl">단행본</span><span class="seg"><button data-trim="trade" aria-pressed="true">신국판</button></span></div>
-  <div class="row"><span class="lbl">와이드</span><span class="seg"><button data-trim="wide" aria-pressed="false">태블릿</button></span></div>
+  <div class="row"><span class="lbl">크기</span><span class="seg" id="seg-trim"><button data-trim="mobile" aria-pressed="false">세로</button><button data-trim="pocket" aria-pressed="false">A6</button><button data-trim="trade" aria-pressed="true">신국판</button><button data-trim="wide" aria-pressed="false">와이드</button></span></div>
+  <div class="row"><span class="lbl">쪽 배치</span><span class="seg" id="seg-view"><button data-view="single" aria-pressed="true">한 면</button><button data-view="spread" aria-pressed="false">두 면</button></span></div>
+  <p class="pop-note">‘두 면’은 책을 펼친 듯 좌우 두 쪽을 보여 줍니다. 화면이 좁으면 한 면으로 자동 전환됩니다.</p>
   <div class="divider"></div>
   <h4>여백</h4>
   <div class="row"><span class="lbl">위</span><span class="stepper"><button data-mg="mTop" data-d="-1">−</button><span class="val" id="mg-mTop">10%</span><button data-mg="mTop" data-d="1">＋</button></span></div>
@@ -574,11 +598,7 @@
   <div class="row"><span class="lbl">오른쪽</span><span class="stepper"><button data-mg="mRight" data-d="-1">−</button><span class="val" id="mg-mRight">10%</span><button data-mg="mRight" data-d="1">＋</button></span></div>
 </div>
 
-<div class="pop" id="pop-view" style="right:16px">
-  <h4>보기</h4>
-  <div class="row"><span class="lbl">쪽 배치</span><span class="seg" id="seg-view"><button data-view="single" aria-pressed="true">한 면</button><button data-view="spread" aria-pressed="false">두 면</button></span></div>
-  <p style="font-size:11.5px;color:var(--muted);margin:6px 0 0;line-height:1.5">두 면은 책을 펼친 듯 좌우 두 쪽을 보여 줍니다. 화면이 좁으면 한 면으로 자동 전환됩니다.</p>
-</div>
+<div id="pop-scrim"></div>
 
 <div class="pop" id="pop-theme" style="right:16px">
   <h4>테마</h4>
@@ -1309,7 +1329,7 @@ function assemble(md){
   const empty=$('#empty'),progress=$('#progress'),progFill=$('#prog-fill'),progLabel=$('#prog-label');
   const phL=$('#ph-l'),phR=$('#ph-r'),pfL=$('#pf-l'),pfC=$('#pf-c'),pfR=$('#pf-r');
   const arrL=$('#arr-l'),arrR=$('#arr-r'),fileInput=$('#file-input'),fnpop=$('#fnpop');
-  const railBtns=['#info-btn','#toc-btn','#type-btn','#trim-btn','#view-btn'].map($);
+  const railBtns=['#info-btn','#toc-btn','#display-btn'].map($);
 
   /* ===== 로드 (SEAM: 향후 토큰 fetch로 교체) ===== */
   function loadManuscript(md){
@@ -1491,17 +1511,27 @@ function assemble(md){
   if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{ if(!book.hidden)reflow(true); });
 
   /* ===== 팝오버 ===== */
-  const pops={info:$('#pop-info'),toc:$('#pop-toc'),type:$('#pop-type'),trim:$('#pop-trim'),view:$('#pop-view'),theme:$('#pop-theme')};
-  function closePops(x){ Object.entries(pops).forEach(([k,el])=>{if(k!==x)el.classList.remove('open');}); }
+  const pops={info:$('#pop-info'),toc:$('#pop-toc'),display:$('#pop-display'),theme:$('#pop-theme')};
+  const isMobilePop=()=>window.matchMedia('(max-width:640px)').matches;
+  function syncPopOpen(){ document.body.classList.toggle('pop-open', Object.values(pops).some(el=>el.classList.contains('open'))); }
+  function closePops(x){ Object.entries(pops).forEach(([k,el])=>{if(k!==x)el.classList.remove('open');}); syncPopOpen(); }
   function toggle(name,btn){ const el=pops[name],open=!el.classList.contains('open'); closePops();
-    if(open){ el.classList.add('open'); const r=btn.getBoundingClientRect(); el.style.right=Math.max(8,(window.innerWidth-r.right))+'px'; } }
+    if(open){ el.classList.add('open');
+      if(isMobilePop()){ el.style.right=''; }                                 // 모바일: 하단 시트 — 위치는 CSS가 담당
+      else { const r=btn.getBoundingClientRect(); el.style.right=Math.max(8,(window.innerWidth-r.right))+'px'; } }
+    syncPopOpen(); }
   $('#info-btn').onclick=e=>toggle('info',e.currentTarget);
   $('#toc-btn').onclick=e=>{buildTOC();toggle('toc',e.currentTarget);};
-  $('#type-btn').onclick=e=>toggle('type',e.currentTarget);
-  $('#trim-btn').onclick=e=>toggle('trim',e.currentTarget);
-  $('#view-btn').onclick=e=>toggle('view',e.currentTarget);
+  $('#display-btn').onclick=e=>toggle('display',e.currentTarget);
   $('#theme-btn').onclick=e=>toggle('theme',e.currentTarget);
   document.addEventListener('click',e=>{ if(e.target.closest('.pop')||e.target.closest('.rail .btn'))return; closePops(); });
+
+  /* ===== 도구막대 접기·펴기 (몰입 읽기) ===== */
+  const chromeToggle=$('#chrome-toggle');
+  if(chromeToggle) chromeToggle.onclick=()=>{ closePops();
+    const hidden=document.body.classList.toggle('chrome-hidden');
+    chromeToggle.title = hidden ? '도구막대 펴기' : '도구막대 접기';
+    requestAnimationFrame(()=>reflow(true)); };
 
   /* ===== 컨트롤 ===== */
   function seg(el,cb){ el.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
