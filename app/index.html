@@ -213,7 +213,44 @@
   @media (max-width:640px){.wordmark small{display:none}body.doc-open .arrow{display:none}.nav-zone{width:30%}.pop{left:8px!important;right:8px;min-width:0}.features{display:none}.land-sub{display:none}.land-mk{font-size:clamp(40px,12vw,60px)}}
   @media (max-height:540px){.land-sub{display:none}.features{display:none}}
   @media (prefers-reduced-motion:reduce){.flow,.progress .fill,.book{transition:none}.pop.open{animation:none}.viewport{scroll-behavior:auto}}
+
+  /* ===== V1.1: 인증 + 대시보드 ===== */
+  .user-chip{display:inline-flex;align-items:center;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12.5px;color:var(--muted);padding:0 4px}
+  .dash{position:absolute;inset:0;z-index:28;overflow:auto;background:var(--stage);-webkit-overflow-scrolling:touch}
+  .dash-inner{max-width:1200px;margin:0 auto;padding:clamp(16px,3vw,36px) clamp(12px,3vw,28px) 64px}
+  .dash-upload{width:100%;margin:0 0 22px}
+  .dash-upload.dz-hot{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
+  .dash-upload.disabled{opacity:.5;cursor:not-allowed}
+  .dash-limit{margin:-8px 0 18px;font-size:13px;color:var(--accent);text-align:center}
+  .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(12px,1.6vw,20px)}
+  @media(max-width:900px){.cards{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:560px){.cards{grid-template-columns:1fr}}
+  .card{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 16px;min-height:118px;cursor:pointer;text-align:left;display:flex;flex-direction:column;gap:8px;font-family:inherit;transition:box-shadow .15s,transform .15s,border-color .15s}
+  .card:hover{border-color:var(--accent);box-shadow:0 14px 36px -24px var(--shadow);transform:translateY(-2px)}
+  .card-title{font-weight:600;font-size:15px;color:var(--ink);line-height:1.35;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .card-date{margin-top:auto;font-size:12px;color:var(--muted)}
+  .card-x{position:absolute;top:8px;right:8px;width:26px;height:26px;border:none;border-radius:8px;background:color-mix(in srgb,var(--stage) 65%,transparent);color:var(--muted);font-size:16px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .15s,background .15s,color .15s}
+  .card:hover .card-x,.card:focus-within .card-x{opacity:1}
+  .card-x:hover{background:#d9534f;color:#fff}
+  .dash-empty{text-align:center;color:var(--muted);padding:44px 0;font-size:14px}
+  .pager{display:flex;justify-content:center;align-items:center;gap:6px;margin-top:30px;flex-wrap:wrap}
+  .pager button{min-width:34px;height:34px;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;cursor:pointer;font-size:13px;padding:0 8px;font-family:inherit}
+  .pager button[disabled]{opacity:.4;cursor:default}
+  .pager button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .modal-bg{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:16px}
+  .modal{position:relative;width:min(380px,100%);background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:28px 26px 22px;box-shadow:0 30px 80px -30px var(--shadow)}
+  .modal h3{margin:0 0 18px;font-size:19px;color:var(--ink)}
+  .modal-x{position:absolute;top:12px;right:12px;width:30px;height:30px;border:none;background:none;color:var(--muted);font-size:22px;line-height:1;cursor:pointer}
+  #auth-form{display:flex;flex-direction:column;gap:11px}
+  #auth-form input{padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--sheet);color:var(--ink);font-size:14px;font-family:inherit}
+  #auth-form input:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+  #auth-submit{margin-top:4px;justify-content:center}
+  .auth-err{font-size:13px;color:#d9534f;line-height:1.5}
+  .auth-switch{margin-top:16px;font-size:13px;color:var(--muted);text-align:center}
+  .auth-switch button{background:none;border:none;color:var(--accent);cursor:pointer;font-size:13px;font-weight:600;padding:0 2px;font-family:inherit}
 </style>
+<script src="../config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 <div class="app">
@@ -227,6 +264,10 @@
     <button class="btn" id="trim-btn" disabled>판형</button>
     <button class="btn" id="view-btn" disabled>보기</button>
     <button class="btn" id="theme-btn">테마</button>
+    <button class="btn" id="login-btn" hidden>로그인</button>
+    <button class="btn solid" id="signup-btn" hidden>회원가입</button>
+    <span class="user-chip" id="user-chip" hidden></span>
+    <button class="btn" id="logout-btn" hidden>로그아웃</button>
   </div>
 
   <div class="stage" id="stage">
@@ -284,8 +325,37 @@
         <footer class="land-foot">주식회사 코드넛 · <a href="https://codnut.com" target="_blank" rel="noopener noreferrer">codnut.com</a> · 미리봄 1.0</footer>
       </div>
     </div>
+
+    <div class="dash" id="dashboard" hidden>
+      <div class="dash-inner">
+        <button class="dropzone dash-upload" id="dash-dropzone" type="button" aria-label="원고 올리기">
+          <span class="dz-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="m7 8 5-5 5 5"/><path d="M4 14v5a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-5"/></svg></span>
+          <div class="dz-title">.md 파일을 여기로 끌어다 놓으세요</div>
+          <div class="dz-sub">또는 눌러서 올리기 — 내 계정에 저장됩니다</div>
+        </button>
+        <div class="dash-limit" id="dash-limit" hidden>최대 20개까지 업로드할 수 있습니다.</div>
+        <div class="cards" id="cards"></div>
+        <div class="dash-empty" id="dash-empty" hidden>아직 저장한 원고가 없습니다. 위에 .md 파일을 올려 보세요.</div>
+        <nav class="pager" id="pager"></nav>
+      </div>
+    </div>
   </div>
 </div>
+
+<div class="modal-bg" id="auth-modal" hidden>
+  <div class="modal">
+    <button class="modal-x" id="auth-close" aria-label="닫기">×</button>
+    <h3 id="auth-title">로그인</h3>
+    <form id="auth-form">
+      <input type="email" id="auth-email" placeholder="이메일" autocomplete="email" required>
+      <input type="password" id="auth-password" placeholder="비밀번호 (6자 이상)" autocomplete="current-password" minlength="6" required>
+      <div class="auth-err" id="auth-err" hidden></div>
+      <button type="submit" class="btn solid lg" id="auth-submit">로그인</button>
+    </form>
+    <div class="auth-switch"><span id="auth-switch-text">계정이 없으신가요?</span> <button type="button" id="auth-switch-btn">회원가입</button></div>
+  </div>
+</div>
+<input type="file" id="dash-file" accept=".md,.markdown,.txt,text/markdown,text/plain" hidden>
 
 <div class="pop" id="pop-info" style="right:16px">
   <h4>원고 정보</h4>
@@ -1330,6 +1400,177 @@ function assemble(md){
 
   document.documentElement.dataset.theme=SETTINGS.theme; mgLabels();
   bgStart(); typeMk();
+  window.__MV = { loadManuscript, resetHome };   // V1.1 대시보드 연결용 확장 지점
+})();
+</script>
+
+<script>
+/* ===================================================================
+   미리봄 V1.1 — 인증 + 개인 대시보드 (Supabase)
+   기존 뷰어(window.__MV.loadManuscript / resetHome)를 재사용한다.
+   =================================================================== */
+(function(){
+  const $=s=>document.querySelector(s);
+  const cfg=window.MIRIBOM_CONFIG, sbLib=window.supabase, V=window.__MV||{};
+  const loginBtn=$('#login-btn'), signupBtn=$('#signup-btn'),
+        logoutBtn=$('#logout-btn'), userChip=$('#user-chip');
+  const hasSB=!!(sbLib && cfg && cfg.SUPABASE_URL && cfg.SUPABASE_ANON_KEY);
+
+  if(!hasSB){
+    [loginBtn,signupBtn,logoutBtn,userChip].forEach(e=>{ if(e) e.hidden=true; });
+    console.warn('[미리봄] Supabase 설정이 없어 뷰어 단독 모드로 동작합니다. (config.js 확인)');
+    return;
+  }
+
+  const sb=sbLib.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
+  const LIMIT=20, PER_PAGE=8;
+  let CUR=null, authed=false, docs=[], page=0, mode='login';
+
+  /* ---------- 화면 전환 ---------- */
+  const dash=$('#dashboard'), cardsEl=$('#cards'), pagerEl=$('#pager'),
+        limitEl=$('#dash-limit'), dashEmpty=$('#dash-empty'), dropzone=$('#dash-dropzone');
+  function showDashboard(){ if(V.resetHome) V.resetHome(); dash.hidden=false; document.body.classList.add('dash-open'); }
+  function hideDashboard(){ dash.hidden=true; document.body.classList.remove('dash-open'); }
+  function setAuthedUI(user){ loginBtn.hidden=true; signupBtn.hidden=true;
+    userChip.hidden=false; userChip.textContent=user.email||'내 계정'; logoutBtn.hidden=false; }
+  function setAnonUI(){ loginBtn.hidden=false; signupBtn.hidden=false;
+    userChip.hidden=true; logoutBtn.hidden=true; }
+
+  /* ---------- 인증 모달 ---------- */
+  const modal=$('#auth-modal'), authForm=$('#auth-form'),
+        emailIn=$('#auth-email'), pwIn=$('#auth-password'),
+        authTitle=$('#auth-title'), authSubmit=$('#auth-submit'),
+        authErr=$('#auth-err'), switchText=$('#auth-switch-text'), switchBtn=$('#auth-switch-btn');
+  function applyMode(){ const login=mode==='login';
+    authTitle.textContent=login?'로그인':'회원가입';
+    authSubmit.textContent=login?'로그인':'회원가입';
+    switchText.textContent=login?'계정이 없으신가요?':'이미 계정이 있으신가요?';
+    switchBtn.textContent=login?'회원가입':'로그인'; }
+  function openAuth(open,m){ if(open){ mode=m||'login'; applyMode(); authErr.hidden=true;
+      emailIn.value=''; pwIn.value=''; modal.hidden=false; setTimeout(()=>emailIn.focus(),40); }
+    else modal.hidden=true; }
+  function showErr(msg){ authErr.textContent=msg; authErr.hidden=false; }
+  function humanAuthErr(e){ const m=(e.message||'').toLowerCase();
+    if(m.includes('invalid login')) return '이메일 또는 비밀번호가 올바르지 않습니다.';
+    if(m.includes('already')) return '이미 가입된 이메일입니다. 로그인해 주세요.';
+    if(m.includes('password')) return '비밀번호는 6자 이상이어야 합니다.';
+    if(m.includes('email')) return '이메일 형식을 확인해 주세요.';
+    return e.message||'인증에 실패했습니다.'; }
+
+  loginBtn.onclick=()=>openAuth(true,'login');
+  signupBtn.onclick=()=>openAuth(true,'signup');
+  $('#auth-close').onclick=()=>openAuth(false);
+  modal.addEventListener('click',e=>{ if(e.target===modal) openAuth(false); });
+  switchBtn.onclick=()=>{ mode=mode==='login'?'signup':'login'; applyMode(); authErr.hidden=true; };
+  logoutBtn.onclick=()=>sb.auth.signOut();
+
+  authForm.onsubmit=async e=>{
+    e.preventDefault();
+    const email=emailIn.value.trim(), password=pwIn.value;
+    if(!email||!password) return;
+    authSubmit.disabled=true;
+    try{
+      if(mode==='signup'){
+        const {data,error}=await sb.auth.signUp({email,password});
+        if(error){ showErr(humanAuthErr(error)); return; }
+        if(!data.session){ showErr('확인 메일을 보냈습니다. 메일의 링크를 누른 뒤 로그인하세요.');
+          mode='login'; applyMode(); return; }
+      } else {
+        const {error}=await sb.auth.signInWithPassword({email,password});
+        if(error){ showErr(humanAuthErr(error)); return; }
+      }
+    } catch(err){ showErr('문제가 발생했습니다: '+(err.message||err)); }
+    finally{ authSubmit.disabled=false; }
+  };
+
+  /* ---------- 세션 ---------- */
+  function applySession(s){ CUR=s; const user=s&&s.user;
+    if(user){ authed=true; setAuthedUI(user); openAuth(false); loadDocs(); showDashboard(); }
+    else { const was=authed; authed=false; setAnonUI(); hideDashboard(); if(was&&V.resetHome) V.resetHome(); } }
+  sb.auth.getSession().then(({data})=>applySession(data.session));
+  sb.auth.onAuthStateChange((_e,s)=>applySession(s));
+
+  /* ---------- 원고(documents) ---------- */
+  async function loadDocs(){
+    const {data,error}=await sb.from('documents')
+      .select('id,title,content_md,created_at').order('created_at',{ascending:false});
+    docs = error ? [] : (data||[]);
+    if(error) console.warn('loadDocs',error);
+    renderLimit(); renderCards();
+  }
+  function renderLimit(){ const full=docs.length>=LIMIT;
+    limitEl.hidden=!full; dropzone.classList.toggle('disabled',full); }
+  function fmtDate(iso){ try{ return new Date(iso).toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric'}); }catch(_){ return ''; } }
+  function renderCards(){
+    cardsEl.innerHTML=''; dashEmpty.hidden=docs.length>0;
+    const pages=Math.max(1,Math.ceil(docs.length/PER_PAGE));
+    if(page>=pages) page=pages-1; if(page<0) page=0;
+    docs.slice(page*PER_PAGE,(page+1)*PER_PAGE).forEach(d=>{
+      const card=document.createElement('button'); card.className='card'; card.type='button';
+      const title=document.createElement('div'); title.className='card-title'; title.textContent=d.title||'제목 없음';
+      const date=document.createElement('div'); date.className='card-date'; date.textContent=fmtDate(d.created_at);
+      const x=document.createElement('button'); x.className='card-x'; x.type='button'; x.textContent='×'; x.setAttribute('aria-label','삭제');
+      x.addEventListener('click',ev=>{ ev.stopPropagation(); onDelete(d); });
+      card.appendChild(x); card.appendChild(title); card.appendChild(date);
+      card.addEventListener('click',()=>openDoc(d));
+      cardsEl.appendChild(card);
+    });
+    renderPager(pages);
+  }
+  function renderPager(pages){ pagerEl.innerHTML=''; if(pages<=1) return;
+    const mk=(label,p,opt)=>{ const b=document.createElement('button'); b.textContent=label;
+      if(opt&&opt.disabled) b.disabled=true; if(opt&&opt.active) b.className='active';
+      b.onclick=()=>{ page=p; renderCards(); }; return b; };
+    pagerEl.appendChild(mk('‹',Math.max(0,page-1),{disabled:page===0}));
+    for(let i=0;i<pages;i++) pagerEl.appendChild(mk(String(i+1),i,{active:i===page}));
+    pagerEl.appendChild(mk('›',Math.min(pages-1,page+1),{disabled:page===pages-1}));
+  }
+  function openDoc(d){ hideDashboard(); if(V.loadManuscript) V.loadManuscript(d.content_md||''); }
+  async function onDelete(d){
+    if(!window.confirm('이 원고를 삭제할까요?\n\n"'+(d.title||'제목 없음')+'"')) return;
+    const {error}=await sb.from('documents').delete().eq('id',d.id);
+    if(error){ alert('삭제 실패: '+error.message); return; }
+    await loadDocs();
+  }
+
+  /* ---------- 업로드 ---------- */
+  function stripExt(name){ return (name||'제목 없음').replace(/\.(md|markdown|txt)$/i,''); }
+  function extractTitle(md,filename){
+    const src=md.charCodeAt(0)===0xFEFF?md.slice(1):md;
+    const fm=src.match(/^---\s*\r?\n([\s\S]*?)\r?\n---/);
+    if(fm){ const t=fm[1].match(/^\s*title\s*:\s*(.+?)\s*$/m);
+      if(t){ return t[1].replace(/^["']|["']$/g,'').trim()||stripExt(filename); } }
+    return stripExt(filename);
+  }
+  async function handleUpload(file){
+    if(!file) return;
+    if(docs.length>=LIMIT){ renderLimit(); alert('최대 20개까지 업로드할 수 있습니다.'); return; }
+    let text='';
+    try{ text=await file.text(); }catch(_){ alert('파일을 읽지 못했습니다.'); return; }
+    const title=extractTitle(text,file.name);
+    const {error}=await sb.from('documents').insert({ owner_id:(CUR&&CUR.user&&CUR.user.id), title, content_md:text });
+    if(error){
+      if(error.code==='23514' || /limit|check/i.test(error.message||'')){ renderLimit(); alert('최대 20개까지 업로드할 수 있습니다.'); }
+      else alert('업로드 실패: '+error.message);
+      return;
+    }
+    await loadDocs();
+  }
+  const dashFile=$('#dash-file');
+  dropzone.addEventListener('click',()=>{ if(!dropzone.classList.contains('disabled')) dashFile.click(); });
+  dashFile.addEventListener('change',e=>{ const f=e.target.files[0]; if(f) handleUpload(f); dashFile.value=''; });
+  ['dragenter','dragover'].forEach(ev=>dash.addEventListener(ev,e=>{ e.preventDefault(); e.stopPropagation();
+    if(!dropzone.classList.contains('disabled')) dropzone.classList.add('dz-hot'); }));
+  ['dragleave','drop'].forEach(ev=>dash.addEventListener(ev,e=>{ e.preventDefault(); e.stopPropagation(); dropzone.classList.remove('dz-hot'); }));
+  dash.addEventListener('drop',e=>{ const f=e.dataTransfer&&e.dataTransfer.files[0]; if(f) handleUpload(f); });
+
+  /* ---------- 로고: 상태별 이동 ---------- */
+  const wm=document.querySelector('.wordmark');
+  if(wm) wm.onclick=()=>{
+    if(authed){ showDashboard(); }
+    else { const book=$('#book'); if(book && !book.hidden){
+      if(window.confirm('문서를 닫고 처음 화면으로 돌아가시겠습니까?')) V.resetHome&&V.resetHome(); } }
+  };
 })();
 </script>
 
