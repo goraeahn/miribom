@@ -218,7 +218,8 @@
   .user-chip{display:inline-flex;align-items:center;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12.5px;color:var(--muted);padding:0 4px}
   .dash{position:absolute;inset:0;z-index:28;overflow:auto;background:var(--stage);-webkit-overflow-scrolling:touch}
   .dash-inner{max-width:1200px;margin:0 auto;padding:clamp(16px,3vw,36px) clamp(12px,3vw,28px) 64px}
-  .dash-upload{width:100%;margin:0 0 22px}
+  .dash-greet{font-family:var(--serif);font-weight:700;font-size:clamp(18px,2.4vw,24px);color:var(--ink);margin:0 0 16px;letter-spacing:.01em}
+  .dash-upload{width:100%;height:clamp(98px,16.8vh,175px);margin:0 0 22px}
   .dash-upload.dz-hot{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
   .dash-upload.disabled{opacity:.5;cursor:not-allowed}
   .dash-limit{margin:-8px 0 18px;font-size:13px;color:var(--accent);text-align:center}
@@ -232,7 +233,7 @@
   .card-x{position:absolute;top:8px;right:8px;width:26px;height:26px;border:none;border-radius:8px;background:color-mix(in srgb,var(--stage) 65%,transparent);color:var(--muted);font-size:16px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .15s,background .15s,color .15s}
   .card:hover .card-x,.card:focus-within .card-x{opacity:1}
   .card-x:hover{background:#d9534f;color:#fff}
-  .dash-empty{text-align:center;color:var(--muted);padding:44px 0;font-size:14px}
+  .dash-empty{text-align:center;color:var(--muted);padding:40px 16px;font-size:14px;border:1.5px solid color-mix(in srgb,var(--muted) 22%,transparent);border-radius:14px;background:transparent}
   .pager{display:flex;justify-content:center;align-items:center;gap:6px;margin-top:30px;flex-wrap:wrap}
   .pager button{min-width:34px;height:34px;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;cursor:pointer;font-size:13px;padding:0 8px;font-family:inherit}
   .pager button[disabled]{opacity:.4;cursor:default}
@@ -328,6 +329,7 @@
 
     <div class="dash" id="dashboard" hidden>
       <div class="dash-inner">
+        <div class="dash-greet" id="dash-greet"></div>
         <button class="dropzone dash-upload" id="dash-dropzone" type="button" aria-label="원고 올리기">
           <span class="dz-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="m7 8 5-5 5 5"/><path d="M4 14v5a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-5"/></svg></span>
           <div class="dz-title">.md 파일을 여기로 끌어다 놓으세요</div>
@@ -335,7 +337,7 @@
         </button>
         <div class="dash-limit" id="dash-limit" hidden>최대 20개까지 업로드할 수 있습니다.</div>
         <div class="cards" id="cards"></div>
-        <div class="dash-empty" id="dash-empty" hidden>아직 저장한 원고가 없습니다. 위에 .md 파일을 올려 보세요.</div>
+        <div class="dash-empty" id="dash-empty" hidden>아직 업로드 된 파일이 없어요.</div>
         <nav class="pager" id="pager"></nav>
       </div>
     </div>
@@ -1432,7 +1434,9 @@ function assemble(md){
   function showDashboard(){ if(V.resetHome) V.resetHome(); dash.hidden=false; document.body.classList.add('dash-open'); }
   function hideDashboard(){ dash.hidden=true; document.body.classList.remove('dash-open'); }
   function setAuthedUI(user){ loginBtn.hidden=true; signupBtn.hidden=true;
-    userChip.hidden=false; userChip.textContent=user.email||'내 계정'; logoutBtn.hidden=false; }
+    userChip.hidden=false; userChip.textContent=user.email||'내 계정'; logoutBtn.hidden=false;
+    const greet=document.querySelector('#dash-greet');
+    if(greet) greet.textContent = (user.email ? user.email+' 님 안녕하세요.' : '안녕하세요.'); }
   function setAnonUI(){ loginBtn.hidden=false; signupBtn.hidden=false;
     userChip.hidden=true; logoutBtn.hidden=true; }
 
