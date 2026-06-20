@@ -250,6 +250,9 @@
   .card-dl{flex-shrink:0;width:26px;height:26px;border:1px solid transparent;border-radius:8px;background:none;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .15s,background .15s,color .15s,border-color .15s;padding:0}
   .card:hover .card-dl,.card:focus-within .card-dl{opacity:1}
   .card-dl:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .card-share{flex-shrink:0;width:26px;height:26px;border:1px solid transparent;border-radius:8px;background:none;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .15s,background .15s,color .15s,border-color .15s;padding:0}
+  .card:hover .card-share,.card:focus-within .card-share{opacity:1}
+  .card-share:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
   .card-x{position:absolute;top:9px;right:8px;width:22px;height:22px;border:none;border-radius:6px;background:color-mix(in srgb,var(--stage) 65%,transparent);color:var(--muted);font-size:14px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .15s,background .15s,color .15s}
   .card:hover .card-x,.card:focus-within .card-x{opacity:1}
   .card-x:hover{background:#d9534f;color:#fff}
@@ -288,6 +291,74 @@
     .user-chip{display:none!important}
     .wordmark{font-size:16px;letter-spacing:.08em;margin-right:0}
   }
+
+  /* ===== V1.1: 비공개 공유 (기획서 §10 새 색상 — 공유 화면 한정) ===== */
+  /* 전역 --accent 등은 손대지 않는다. 아래 토큰은 공유 UI 안에서만 쓰인다. */
+  #share-modal,#share-gate,#share-expired{
+    --s-primary:#5651B8;--s-primary-text:#fff;
+    --s-bg:#F4F1E9;--s-surface:#fff;--s-border:#E7E2D6;--s-text:#2B2824;--s-muted:#8C877D;
+  }
+  :root[data-theme="night"] #share-modal,
+  :root[data-theme="night"] #share-gate,
+  :root[data-theme="night"] #share-expired{
+    --s-primary:#B9B9E6;--s-primary-text:#1A1815;
+    --s-bg:#1A1815;--s-surface:#242019;--s-border:#38332B;--s-text:#ECE7DD;--s-muted:#948E83;
+  }
+
+  /* 공유 모달 (작성자) — 백드롭은 기존 .modal-bg 재사용, 패널은 §10 색 */
+  .share-card{position:relative;width:min(460px,100%);max-height:88vh;overflow:auto;background:var(--s-surface);color:var(--s-text);border:1px solid var(--s-border);border-radius:18px;padding:26px 24px 22px;box-shadow:0 30px 80px -30px rgba(0,0,0,.5)}
+  .share-card .modal-x{color:var(--s-muted)}
+  .share-h{margin:0 0 4px;font-size:19px;color:var(--s-text);font-weight:700}
+  .share-sub{margin:0 0 18px;font-size:13px;color:var(--s-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .share-field{margin:0 0 16px}
+  .share-label{display:block;font-size:12.5px;font-weight:600;color:var(--s-muted);margin:0 0 7px}
+  .share-seg{display:flex;gap:6px}
+  .share-seg button{flex:1;padding:9px 4px;font-size:13px;font-family:inherit;color:var(--s-text);background:var(--s-surface);border:1px solid var(--s-border);border-radius:9px;cursor:pointer;transition:border-color .15s,background .15s,color .15s}
+  .share-seg button:hover{border-color:var(--s-primary)}
+  .share-seg button.on{background:var(--s-primary);color:var(--s-primary-text);border-color:var(--s-primary)}
+  .share-url-row{display:flex;gap:7px;align-items:stretch}
+  .share-url{flex:1;min-width:0;padding:10px 12px;font-size:13px;font-family:inherit;color:var(--s-text);background:color-mix(in srgb,var(--s-bg) 60%,var(--s-surface));border:1px solid var(--s-border);border-radius:10px}
+  .share-url:focus{outline:2px solid var(--s-primary);outline-offset:1px;border-color:var(--s-primary)}
+  .share-btn-primary{flex:0 0 auto;padding:10px 16px;font-size:13px;font-weight:600;font-family:inherit;color:var(--s-primary-text);background:var(--s-primary);border:1px solid var(--s-primary);border-radius:10px;cursor:pointer;white-space:nowrap;transition:filter .15s}
+  .share-btn-primary:hover{filter:brightness(1.06)}
+  .share-btn-primary:disabled{opacity:.55;cursor:default;filter:none}
+  .share-help{margin:9px 0 0;font-size:12px;color:var(--s-muted);line-height:1.5}
+  .share-status-sec{margin-top:6px;border-top:1px solid var(--s-border);padding-top:16px}
+  .share-status-h{font-size:12.5px;font-weight:600;color:var(--s-muted);margin:0 0 10px}
+  .share-link-row{border:1px solid var(--s-border);border-radius:12px;padding:12px 13px;margin:0 0 10px;background:color-mix(in srgb,var(--s-bg) 45%,var(--s-surface))}
+  .share-link-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .share-badge{font-size:11px;font-weight:700;color:var(--s-primary-text);background:var(--s-primary);border-radius:999px;padding:2px 9px}
+  .share-link-meta{flex:1;min-width:0;font-size:12.5px;color:var(--s-muted)}
+  .share-revoke{flex:0 0 auto;font-size:12px;font-family:inherit;color:#c0392b;background:none;border:1px solid color-mix(in srgb,#c0392b 35%,var(--s-border));border-radius:8px;padding:5px 10px;cursor:pointer;transition:background .15s,color .15s}
+  .share-revoke:hover{background:#c0392b;color:#fff;border-color:#c0392b}
+  .share-link-revoked{opacity:.55}
+  .share-names{margin:9px 0 0;font-size:12.5px;color:var(--s-text);line-height:1.7}
+  .share-names .nm{color:var(--s-muted)}
+  .share-empty{font-size:12.5px;color:var(--s-muted);padding:2px 0 4px}
+
+  /* 공유 진입/만료 화면 (받는 사람) — 전체 화면 카드 */
+  .share-screen{position:fixed;inset:0;z-index:40;display:none;align-items:center;justify-content:center;padding:24px;background:var(--s-bg);color:var(--s-text)}
+  .share-screen.show{display:flex}
+  .share-screen-card{width:min(380px,100%);text-align:center}
+  .share-screen-kicker{margin:0 0 10px;font-size:12.5px;color:var(--s-muted);letter-spacing:.02em}
+  .share-screen-title{margin:0 0 18px;font-family:var(--serif);font-size:clamp(20px,4.5vw,25px);font-weight:700;color:var(--s-text);line-height:1.4}
+  .share-name-input{width:100%;padding:13px 15px;font-size:15px;font-family:inherit;color:var(--s-text);background:var(--s-surface);border:1px solid var(--s-border);border-radius:12px;text-align:center;margin:0 0 12px}
+  .share-name-input:focus{outline:2px solid var(--s-primary);outline-offset:1px;border-color:var(--s-primary)}
+  .share-start-btn{width:100%;padding:13px;font-size:15px;font-weight:700;font-family:inherit;color:var(--s-primary-text);background:var(--s-primary);border:1px solid var(--s-primary);border-radius:12px;cursor:pointer;transition:filter .15s}
+  .share-start-btn:hover{filter:brightness(1.06)}
+  .share-start-btn:disabled{opacity:.5;cursor:default;filter:none}
+  .share-screen-foot{margin:16px 0 0;font-size:12px;color:var(--s-muted);line-height:1.6}
+
+  /* 공유 뷰어 모드 — 작성자용 컨트롤 숨김 */
+  body.share-mode #open-btn,
+  body.share-mode .upload-toggle,
+  body.share-mode #info-btn,
+  body.share-mode #login-btn,
+  body.share-mode #signup-btn,
+  body.share-mode #logout-btn,
+  body.share-mode #user-chip{display:none!important}
+  body.share-mode .wordmark{cursor:default;pointer-events:none}
+  body.share-mode #empty{display:none!important}
 </style>
 <script src="../config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -410,6 +481,59 @@
     <div class="auth-switch"><span id="auth-switch-text">계정이 없으신가요?</span> <button type="button" id="auth-switch-btn">회원가입</button></div>
   </div>
 </div>
+
+<!-- 공유 링크 만들기 (작성자) -->
+<div class="modal-bg" id="share-modal" hidden>
+  <div class="share-card">
+    <button class="modal-x" id="share-close" aria-label="닫기">×</button>
+    <h3 class="share-h">공유 링크 만들기</h3>
+    <p class="share-sub" id="share-sub">읽기 전용으로 열립니다</p>
+
+    <div class="share-field">
+      <span class="share-label">공개 기간</span>
+      <div class="share-seg" id="share-period">
+        <button type="button" data-p="1w">1주</button>
+        <button type="button" data-p="2w">2주</button>
+        <button type="button" data-p="1m" class="on">한 달</button>
+        <button type="button" data-p="3m">3달</button>
+      </div>
+    </div>
+
+    <div class="share-field">
+      <span class="share-label">공유 링크</span>
+      <div class="share-url-row">
+        <input class="share-url" id="share-url" readonly placeholder="기간을 고르고 ‘링크 만들기’를 누르세요">
+        <button class="share-btn-primary" id="share-make">링크 만들기</button>
+      </div>
+      <p class="share-help">설정한 기간이 지나면 링크가 자동으로 닫힙니다.</p>
+    </div>
+
+    <div class="share-status-sec" id="share-status-sec" hidden>
+      <div class="share-status-h">열람 현황</div>
+      <div id="share-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 공유 진입: 이름 입력 (받는 사람) -->
+<div class="share-screen" id="share-gate">
+  <div class="share-screen-card">
+    <p class="share-screen-kicker">비공개로 공유된 원고입니다</p>
+    <h2 class="share-screen-title">읽기 전에 성함을 남겨주세요</h2>
+    <input class="share-name-input" id="share-name" placeholder="이름" autocomplete="name" maxlength="60">
+    <button class="share-start-btn" id="share-start" disabled>읽기 시작</button>
+    <p class="share-screen-foot">입력하신 이름과 접속 시각이 작성자에게 전달됩니다.</p>
+  </div>
+</div>
+
+<!-- 공유 만료/무효 (받는 사람) -->
+<div class="share-screen" id="share-expired">
+  <div class="share-screen-card">
+    <h2 class="share-screen-title">공개 기간이 종료되었습니다</h2>
+    <p class="share-screen-foot">작성자에게 링크를 다시 요청해 주세요.</p>
+  </div>
+</div>
+
 <input type="file" id="dash-file" accept=".md,.markdown,.txt,text/markdown,text/plain" hidden>
 
 <div class="pop" id="pop-info" style="right:16px">
@@ -1466,6 +1590,8 @@ function assemble(md){
    =================================================================== */
 (function(){
   const $=s=>document.querySelector(s);
+  // 공유 뷰어 모드(?t=토큰)에서는 대시보드/인증을 초기화하지 않는다. 아래 별도 IIFE 가 담당.
+  if(new URLSearchParams(location.search).get('t')) return;
   const cfg=window.MIRIBOM_CONFIG, sbLib=window.supabase, V=window.__MV||{};
   const loginBtn=$('#login-btn'), signupBtn=$('#signup-btn'),
         logoutBtn=$('#logout-btn'), userChip=$('#user-chip');
@@ -1602,6 +1728,7 @@ function assemble(md){
     }catch(_){ return ''; }
   }
   const DL_ICON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><path d="M12 15V3"/><path d="m7 10 5 5 5-5"/><path d="M4 19v1a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-1"/></svg>';
+  const SHARE_ICON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="10.5" x2="15.4" y2="6.5"/><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/></svg>';
   function renderCards(){
     renderCount();
     cardsEl.innerHTML=''; dashEmpty.hidden=docs.length>0;
@@ -1616,9 +1743,11 @@ function assemble(md){
       const title=document.createElement('div'); title.className='card-title'; title.textContent=d.title||'제목 없음';
       const bottom=document.createElement('div'); bottom.className='card-bottom';
       const date=document.createElement('div'); date.className='card-date'; date.textContent=fmtDate(d.created_at);
+      const share=document.createElement('button'); share.className='card-share'; share.type='button'; share.title='공유'; share.innerHTML=SHARE_ICON;
+      share.addEventListener('click',ev=>{ ev.stopPropagation(); openShareModal(d); });
       const dl=document.createElement('button'); dl.className='card-dl'; dl.type='button'; dl.title='다운로드'; dl.innerHTML=DL_ICON;
       dl.addEventListener('click',ev=>downloadDoc(d,ev));
-      bottom.appendChild(date); bottom.appendChild(dl);
+      bottom.appendChild(date); bottom.appendChild(share); bottom.appendChild(dl);
       const x=document.createElement('button'); x.className='card-x'; x.type='button'; x.textContent='×'; x.setAttribute('aria-label','삭제');
       x.addEventListener('click',ev=>{ ev.stopPropagation(); onDelete(d); });
       card.appendChild(bar); card.appendChild(x); card.appendChild(title); card.appendChild(bottom);
@@ -1701,6 +1830,111 @@ function assemble(md){
   if(manualBtn) manualBtn.onclick=()=>{ const s=document.getElementById('sample-doc');
     if(s){ hideDashboard(); if(V.loadManuscript) V.loadManuscript(s.textContent); } };
 
+  /* ---------- 공유 링크 (작성자) ---------- */
+  const shareModal=$('#share-modal'), shareSub=$('#share-sub'),
+        shareUrlIn=$('#share-url'), shareMakeBtn=$('#share-make'),
+        sharePeriod=$('#share-period'), shareStatusSec=$('#share-status-sec'),
+        shareListEl=$('#share-list');
+  let shareDoc=null, sharePeriodVal='1m', shareMadeUrl='';
+  const PERIOD_LABEL={'1w':'1주','2w':'2주','1m':'한 달','3m':'3달'};
+
+  function shareOrigin(){ return location.origin + location.pathname; }   // .../app/index.html
+  function setShareMakeMode(made){ shareMakeBtn.textContent=made?'복사':'링크 만들기'; shareMakeBtn.dataset.mode=made?'copy':'make'; }
+  function escapeName(s){ const d=document.createElement('div'); d.textContent=s||'(이름 없음)'; return d.innerHTML; }
+  function fmtExpiry(iso){ try{ const d=new Date(iso); return d.getFullYear()+'. '+(d.getMonth()+1)+'. '+d.getDate()+'.'; }catch(_){ return ''; } }
+
+  function openShareModal(d){
+    shareDoc=d; sharePeriodVal='1m'; shareMadeUrl='';
+    shareSub.textContent=(d.title||'제목 없음')+' · 읽기 전용으로 열립니다';
+    shareUrlIn.value=''; setShareMakeMode(false);
+    sharePeriod.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.p==='1m'));
+    shareStatusSec.hidden=true; shareListEl.innerHTML='';
+    shareModal.hidden=false;
+    loadShareList(d.id);
+  }
+  function closeShareModal(){ shareModal.hidden=true; shareDoc=null; }
+
+  sharePeriod.querySelectorAll('button').forEach(b=>{ b.onclick=()=>{
+    sharePeriodVal=b.dataset.p;
+    sharePeriod.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));
+    shareUrlIn.value=''; shareMadeUrl=''; setShareMakeMode(false);   // 기간 바꾸면 새 링크 필요
+  }; });
+
+  $('#share-close').onclick=closeShareModal;
+  shareModal.addEventListener('click',e=>{ if(e.target===shareModal) closeShareModal(); });
+
+  shareMakeBtn.onclick=async()=>{
+    if(!shareDoc) return;
+    if(shareMakeBtn.dataset.mode==='copy'){
+      try{ await navigator.clipboard.writeText(shareMadeUrl); shareMakeBtn.textContent='복사됨';
+        setTimeout(()=>{ if(shareMakeBtn.dataset.mode==='copy') shareMakeBtn.textContent='복사'; },1400); }
+      catch(_){ shareUrlIn.focus(); shareUrlIn.select(); try{document.execCommand('copy');}catch(__){} }
+      return;
+    }
+    shareMakeBtn.disabled=true;
+    const {data,error}=await sb.rpc('create_share_link',{p_document_id:shareDoc.id,p_period:sharePeriodVal});
+    shareMakeBtn.disabled=false;
+    const token=data&&data.token;
+    if(error||!token){ alert('공유 링크를 만들지 못했습니다.'+(error?'\n'+error.message:'')); return; }
+    shareMadeUrl=shareOrigin()+'?t='+token;
+    shareUrlIn.value=shareMadeUrl; setShareMakeMode(true);
+    try{ await navigator.clipboard.writeText(shareMadeUrl); }catch(_){}
+    loadShareList(shareDoc.id);
+  };
+
+  async function loadShareList(docId){
+    const {data:links,error}=await sb.from('shares')
+      .select('id,token,period,expires_at,is_active,created_at')
+      .eq('document_id',docId).order('created_at',{ascending:false});
+    if(error){ console.warn('loadShareList',error); return; }
+    const ids=(links||[]).map(l=>l.id);
+    let events=[];
+    if(ids.length){
+      const {data:ev}=await sb.from('share_access_events')
+        .select('share_id,viewer_name,occurred_at').in('share_id',ids)
+        .order('occurred_at',{ascending:false});
+      events=ev||[];
+    }
+    renderShareList(links||[],events);
+  }
+  function renderShareList(links,events){
+    if(!links.length){ shareStatusSec.hidden=true; shareListEl.innerHTML=''; return; }
+    shareStatusSec.hidden=false;
+    const byShare={}; events.forEach(e=>{ (byShare[e.share_id]=byShare[e.share_id]||[]).push(e); });
+    shareListEl.innerHTML='';
+    links.forEach(l=>{
+      const evs=byShare[l.id]||[];
+      const expired = l.expires_at && new Date(l.expires_at) < new Date();
+      const active = l.is_active && !expired;
+      const row=document.createElement('div'); row.className='share-link-row'+(active?'':' share-link-revoked');
+      const top=document.createElement('div'); top.className='share-link-top';
+      const badge=document.createElement('span'); badge.className='share-badge'; badge.textContent=PERIOD_LABEL[l.period]||'기간';
+      const meta=document.createElement('span'); meta.className='share-link-meta';
+      const last=evs.length?fmtDate(evs[0].occurred_at):'아직 없음';
+      const stateTxt=!l.is_active?'회수됨':(expired?'만료됨':'만료 '+fmtExpiry(l.expires_at));
+      meta.textContent='열람 '+evs.length+'회 · 마지막 '+last+' · '+stateTxt;
+      top.appendChild(badge); top.appendChild(meta);
+      if(active){
+        const rv=document.createElement('button'); rv.className='share-revoke'; rv.type='button'; rv.textContent='회수';
+        rv.onclick=()=>revokeShare(l);
+        top.appendChild(rv);
+      }
+      row.appendChild(top);
+      if(evs.length){
+        const names=document.createElement('div'); names.className='share-names';
+        names.innerHTML='열람자: '+evs.map(e=>escapeName(e.viewer_name)+' <span class="nm">('+fmtDate(e.occurred_at)+')</span>').join(', ');
+        row.appendChild(names);
+      }
+      shareListEl.appendChild(row);
+    });
+  }
+  async function revokeShare(l){
+    if(!window.confirm('이 공유 링크를 회수할까요?\n회수하면 받은 사람은 더 이상 열 수 없습니다.')) return;
+    const {error}=await sb.from('shares').update({is_active:false}).eq('id',l.id);
+    if(error){ alert('회수 실패: '+error.message); return; }
+    if(shareDoc) loadShareList(shareDoc.id);
+  }
+
   /* ---------- 로고: 상태별 이동 ---------- */
   const wm=document.querySelector('.wordmark');
   if(wm) wm.onclick=()=>{
@@ -1708,6 +1942,67 @@ function assemble(md){
     else { const book=$('#book'); if(book && !book.hidden){
       if(window.confirm('문서를 닫고 처음 화면으로 돌아가시겠습니까?')) V.resetHome&&V.resetHome(); } }
   };
+})();
+</script>
+
+<script>
+/* ===================================================================
+   미리봄 V1.1 — 비공개 공유 뷰어 (?t=토큰)
+   받는 사람은 로그인하지 않는다. 이름만 입력하면 읽기 전용으로 본다.
+   기존 리더(window.__MV.loadManuscript)를 그대로 재사용한다.
+   =================================================================== */
+(function(){
+  const token=new URLSearchParams(location.search).get('t');
+  if(!token) return;   // 일반 앱 모드 — 아무것도 하지 않음
+
+  // 검색엔진 비노출 + 레퍼러 차단 (공유 모드에서만 주입 → 일반 앱 페이지엔 영향 없음)
+  const m1=document.createElement('meta'); m1.name='robots'; m1.content='noindex,nofollow'; document.head.appendChild(m1);
+  const m2=document.createElement('meta'); m2.name='referrer'; m2.content='no-referrer'; document.head.appendChild(m2);
+
+  document.body.classList.add('share-mode');
+
+  const $=s=>document.querySelector(s);
+  const gate=$('#share-gate'), expired=$('#share-expired'),
+        nameIn=$('#share-name'), startBtn=$('#share-start'), loading=$('#loading');
+  const V=window.__MV||{};
+  const cfg=window.MIRIBOM_CONFIG, sbLib=window.supabase;
+  const COOKIE='mrb_share_'+token;
+
+  function showExpired(){ gate.classList.remove('show'); expired.classList.add('show'); }
+  function showGate(){ expired.classList.remove('show'); gate.classList.add('show'); setTimeout(()=>nameIn.focus(),60); }
+  function showLoading(msg){ if(!loading) return; const l=loading.querySelector('.lmsg'); if(l) l.textContent=msg||'잠시만요…'; loading.hidden=false; }
+  function hideLoading(){ if(loading) loading.hidden=true; }
+  function getCookie(){ const m=document.cookie.match(new RegExp('(?:^|; )'+COOKIE.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'=([^;]*)')); return m?decodeURIComponent(m[1]):''; }
+  function setCookie(name){ document.cookie=COOKIE+'='+encodeURIComponent(name)+'; max-age='+(60*60*24*30)+'; path=/; samesite=lax'; }
+
+  if(!(sbLib && cfg && cfg.SUPABASE_URL && cfg.SUPABASE_ANON_KEY)){ showExpired(); return; }
+  const sb=sbLib.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY, {auth:{persistSession:false}});
+
+  function syncStart(){ startBtn.disabled = nameIn.value.trim().length===0; }
+  nameIn.addEventListener('input',syncStart);
+  nameIn.addEventListener('keydown',e=>{ if(e.key==='Enter' && nameIn.value.trim()) doEnter(nameIn.value.trim()); });
+  startBtn.onclick=()=>{ const n=nameIn.value.trim(); if(n) doEnter(n); };
+
+  async function doEnter(name){
+    startBtn.disabled=true;
+    gate.classList.remove('show');
+    showLoading('원고를 펼치는 중…');
+    const {data,error}=await sb.rpc('share_enter',{p_token:token,p_viewer_name:name});
+    if(error || !data || !data.ok){ hideLoading(); showExpired(); return; }
+    setCookie(name);
+    hideLoading();
+    if(V.loadManuscript) V.loadManuscript(data.content_md||''); else showExpired();
+  }
+
+  // 진입: 유효성 먼저 확인 → 만료/이름입력 분기 (쿠키 있으면 이름 생략하고 바로 입장)
+  (async function init(){
+    showLoading('링크를 확인하는 중…');
+    const {data,error}=await sb.rpc('share_status',{p_token:token});
+    hideLoading();
+    if(error || !data || !data.ok){ showExpired(); return; }
+    const saved=getCookie();
+    if(saved) doEnter(saved); else showGate();
+  })();
 })();
 </script>
 
