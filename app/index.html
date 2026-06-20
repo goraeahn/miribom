@@ -204,7 +204,7 @@
   body.doc-open .nav-zone{display:block}
   #info-btn,#toc-btn,#type-btn,#trim-btn,#view-btn{display:none}
   body.doc-open #info-btn,body.doc-open #toc-btn,body.doc-open #type-btn,body.doc-open #trim-btn,body.doc-open #view-btn{display:inline-flex}
-  .loading{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:20;background:color-mix(in srgb,var(--stage) 80%,transparent)}
+  .loading{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:29;background:color-mix(in srgb,var(--stage) 80%,transparent)}
   .loading .spinner{width:34px;height:34px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--accent);animation:spin .8s linear infinite}
   .loading .lmsg{font-size:12.5px;color:var(--muted);letter-spacing:.06em}
   @keyframes spin{to{transform:rotate(360deg)}}
@@ -221,9 +221,13 @@
   .dash-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 16px}
   .dash-greet{font-family:var(--serif);font-weight:700;font-size:clamp(18px,2.4vw,24px);color:var(--ink);margin:0;letter-spacing:.01em;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   #dash-manual{flex:0 0 auto;white-space:nowrap}
-  .dash-count{margin:0 0 14px;font-size:13.5px;color:var(--muted);font-weight:500}
-  .upload-toggle{display:none;align-items:center;gap:5px;font-size:12.5px;color:var(--muted);cursor:pointer;user-select:none;white-space:nowrap}
-  .upload-toggle input{accent-color:var(--accent);cursor:pointer;margin:0}
+  .dash-count{font-size:13.5px;color:var(--muted);font-weight:500}
+  .upload-toggle{display:none;align-items:center;gap:7px;font-size:12.5px;color:var(--muted);cursor:pointer;user-select:none;white-space:nowrap}
+  .upload-toggle input{position:absolute;opacity:0;width:0;height:0;margin:0}
+  .toggle-track{position:relative;display:inline-block;width:32px;height:18px;background:var(--line);border-radius:9px;transition:background .2s;flex-shrink:0}
+  .toggle-track::after{content:"";position:absolute;left:2px;top:2px;width:14px;height:14px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .2s}
+  .upload-toggle input:checked+.toggle-track{background:var(--accent)}
+  .upload-toggle input:checked+.toggle-track::after{transform:translateX(14px)}
   body.dash-open .upload-toggle{display:inline-flex}
   body.dash-open #info-btn,body.dash-open #toc-btn,body.dash-open #type-btn,body.dash-open #trim-btn,body.dash-open #view-btn{display:none!important}
   .dash-upload{width:100%;height:clamp(98px,16.8vh,175px);margin:0 0 22px}
@@ -233,14 +237,31 @@
   .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(12px,1.6vw,20px)}
   @media(max-width:900px){.cards{grid-template-columns:repeat(2,1fr)}}
   @media(max-width:560px){.cards{grid-template-columns:1fr}}
-  .card{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 16px;min-height:118px;cursor:pointer;text-align:left;display:flex;flex-direction:column;gap:8px;font-family:inherit;transition:box-shadow .15s,transform .15s,border-color .15s}
-  .card:hover{border-color:var(--accent);box-shadow:0 14px 36px -24px var(--shadow);transform:translateY(-2px)}
+  .card{position:relative;overflow:hidden;background:var(--cg,#FAF1EF);border:1px solid color-mix(in srgb,var(--cb,#D98F88) 22%,var(--line));border-radius:14px;padding:24px 16px 14px;min-height:118px;cursor:pointer;text-align:left;display:flex;flex-direction:column;gap:6px;font-family:inherit;transition:box-shadow .15s,transform .15s,border-color .15s;color:var(--ink)}
+  [data-theme="sepia"] .card{background:var(--cgsp,#F5EDE9)}
+  [data-theme="night"] .card{background:var(--cgdk,#2C211F)}
+  .card:hover{box-shadow:0 14px 36px -24px var(--shadow);transform:translateY(-2px)}
+  .card-bar{position:absolute;top:0;left:0;right:0;height:5px;background:var(--cb,#D98F88)}
+  [data-theme="sepia"] .card-bar{background:var(--cbsp,#C98C85)}
+  [data-theme="night"] .card-bar{background:var(--cbdk,#E6A6A0)}
   .card-title{font-weight:600;font-size:15px;color:var(--ink);line-height:1.35;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-  .card-date{margin-top:auto;font-size:12px;color:var(--muted)}
-  .card-x{position:absolute;top:8px;right:8px;width:26px;height:26px;border:none;border-radius:8px;background:color-mix(in srgb,var(--stage) 65%,transparent);color:var(--muted);font-size:16px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .15s,background .15s,color .15s}
+  .card-bottom{display:flex;align-items:center;margin-top:auto;gap:4px}
+  .card-date{flex:1;font-size:12px;color:var(--muted)}
+  .card-dl{flex-shrink:0;width:26px;height:26px;border:1px solid transparent;border-radius:8px;background:none;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .15s,background .15s,color .15s,border-color .15s;padding:0}
+  .card:hover .card-dl,.card:focus-within .card-dl{opacity:1}
+  .card-dl:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .card-x{position:absolute;top:9px;right:8px;width:22px;height:22px;border:none;border-radius:6px;background:color-mix(in srgb,var(--stage) 65%,transparent);color:var(--muted);font-size:14px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .15s,background .15s,color .15s}
   .card:hover .card-x,.card:focus-within .card-x{opacity:1}
   .card-x:hover{background:#d9534f;color:#fff}
   .dash-empty{text-align:center;color:var(--muted);padding:40px 16px;font-size:14px;border:1.5px solid color-mix(in srgb,var(--muted) 22%,transparent);border-radius:14px;background:transparent}
+  .cards-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 14px;flex-wrap:wrap}
+  .dash-count{font-size:13.5px;color:var(--muted);font-weight:500}
+  .sort-btns{display:flex;gap:4px;flex-shrink:0}
+  .sort-btn{background:none;border:1px solid var(--line);border-radius:8px;padding:5px 10px;font-size:12px;color:var(--muted);cursor:pointer;font-family:inherit;white-space:nowrap;transition:border-color .15s,background .15s,color .15s}
+  .sort-btn:hover{border-color:var(--accent);color:var(--ink)}
+  .sort-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .dash-foot{margin-top:36px;padding-bottom:8px;font-size:11.5px;color:var(--muted);text-align:center}
+  .dash-foot a{color:var(--muted);text-decoration:underline;text-underline-offset:2px}
   .pager{display:flex;justify-content:center;align-items:center;gap:6px;margin-top:30px;flex-wrap:wrap}
   .pager button{min-width:34px;height:34px;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;cursor:pointer;font-size:13px;padding:0 8px;font-family:inherit}
   .pager button[disabled]{opacity:.4;cursor:default}
@@ -265,7 +286,7 @@
   <div class="rail">
     <span class="wordmark">미리봄<small>preview</small></span>
     <button class="btn" id="open-btn"><span class="glyph">＋</span>원고 열기</button>
-    <label class="upload-toggle" title="켜면 업로드 후 바로 뷰어로 이동합니다"><input type="checkbox" id="upload-open-toggle">업로드 후 열기</label>
+    <label class="upload-toggle" title="켜면 업로드 후 바로 뷰어로 이동합니다"><input type="checkbox" id="upload-open-toggle"><span class="toggle-track"></span>업로드 후 열기</label>
     <span class="spacer"></span>
     <button class="btn" id="info-btn" disabled>정보</button>
     <button class="btn" id="toc-btn" disabled>목차</button>
@@ -347,10 +368,19 @@
           <div class="dz-sub">또는 눌러서 올리기 — 내 계정에 저장됩니다</div>
         </button>
         <div class="dash-limit" id="dash-limit" hidden>최대 20개까지 업로드할 수 있습니다.</div>
-        <div class="dash-count" id="dash-count" hidden></div>
+        <div class="cards-header" id="cards-header" hidden>
+          <div class="dash-count" id="dash-count"></div>
+          <div class="sort-btns">
+            <button class="sort-btn active" data-sort="newest">최신순</button>
+            <button class="sort-btn" data-sort="oldest">오래된순</button>
+            <button class="sort-btn" data-sort="korean">가나다순</button>
+            <button class="sort-btn" data-sort="alpha">영문순</button>
+          </div>
+        </div>
         <div class="cards" id="cards"></div>
         <div class="dash-empty" id="dash-empty" hidden>아직 업로드 된 파일이 없어요.</div>
         <nav class="pager" id="pager"></nav>
+        <footer class="dash-foot">주식회사 코드넛 · <a href="https://codnut.com" target="_blank" rel="noopener noreferrer">codnut.com</a> · 미리봄 1.0</footer>
       </div>
     </div>
   </div>
@@ -1437,8 +1467,34 @@ function assemble(md){
   }
 
   const sb=sbLib.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
-  const LIMIT=20, PER_PAGE=8;
-  let CUR=null, authed=false, docs=[], page=0, mode='login';
+  const LIMIT=20, PER_PAGE=12;
+  const PALETTES=[
+    {cb:'#D98F88',cg:'#FAF1EF',cbsp:'#C98C85',cgsp:'#F5EDE9',cbdk:'#E6A6A0',cgdk:'#2C211F'}, // 로즈
+    {cb:'#E0A982',cg:'#FBF3EC',cbsp:'#D4A27C',cgsp:'#F6EDE4',cbdk:'#ECBE97',cgdk:'#2C231C'}, // 애프리콧
+    {cb:'#D9BE7C',cg:'#FAF5EA',cbsp:'#CCAF72',cgsp:'#F5EFE1',cbdk:'#E6CE94',cgdk:'#2B2519'}, // 허니
+    {cb:'#A7BE8E',cg:'#F2F5EC',cbsp:'#9BB57E',cgsp:'#ECF0E4',cbdk:'#BFD2A8',cgdk:'#232719'}, // 세이지
+    {cb:'#8DC0AE',cg:'#EDF6F2',cbsp:'#81B6A2',cgsp:'#E6F0EA',cbdk:'#A4D2C2',cgdk:'#1F2723'}, // 제이드
+    {cb:'#93B6D6',cg:'#EEF3F8',cbsp:'#88A9C6',cgsp:'#E8EDF4',cbdk:'#A8C6E2',cgdk:'#1F2429'}, // 스카이
+    {cb:'#A6A6D9',cg:'#F0F0F8',cbsp:'#9898CC',cgsp:'#E9E9F4',cbdk:'#B9B9E6',cgdk:'#23222B'}, // 아이리스
+    {cb:'#C49BC8',cg:'#F6F0F7',cbsp:'#B590BC',cgsp:'#F0E9F2',cbdk:'#D6B2D9',cgdk:'#29212A'}, // 라일락
+  ];
+  let CUR=null, authed=false, docs=[], page=0, mode='login', sortMode='newest';
+  function colorIdx(id){ let s=0; for(let i=0;i<(id||'').length;i++) s+=id.charCodeAt(i); return s%PALETTES.length; }
+  function getSortedDocs(){
+    const arr=[...docs];
+    if(sortMode==='oldest') return arr.reverse();
+    if(sortMode==='korean') return arr.sort((a,b)=>(a.title||'').localeCompare(b.title||'','ko'));
+    if(sortMode==='alpha') return arr.sort((a,b)=>(a.title||'').localeCompare(b.title||''));
+    return arr; // newest: already desc from Supabase
+  }
+  function downloadDoc(d,ev){
+    ev.stopPropagation();
+    const blob=new Blob([d.content_md||''],{type:'text/markdown;charset=utf-8'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a'); a.href=url; a.download=(d.title||'원고')+'.md';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
 
   /* ---------- 화면 전환 ---------- */
   const dash=$('#dashboard'), cardsEl=$('#cards'), pagerEl=$('#pager'),
@@ -1508,16 +1564,21 @@ function assemble(md){
 
   /* ---------- 원고(documents) ---------- */
   async function loadDocs(){
+    const loading=$('#loading');
+    loading.querySelector('.lmsg').textContent='원고 목록을 불러오는 중…';
+    loading.hidden=false;
     const {data,error}=await sb.from('documents')
       .select('id,title,content_md,created_at').order('created_at',{ascending:false});
+    loading.hidden=true;
     docs = error ? [] : (data||[]);
     if(error) console.warn('loadDocs',error);
     renderLimit(); renderCards();
   }
   function renderLimit(){ const full=docs.length>=LIMIT;
     limitEl.hidden=!full; dropzone.classList.toggle('disabled',full); }
-  function renderCount(){ const el=$('#dash-count'); if(!el) return;
-    el.hidden = docs.length===0; el.textContent = '업로드된 책이 '+docs.length+'건 있어요.'; }
+  function renderCount(){ const el=$('#dash-count'), hdr=$('#cards-header'); if(!el) return;
+    el.textContent='업로드된 책이 '+docs.length+'건 있어요.';
+    if(hdr) hdr.hidden=docs.length===0; }
   function fmtDate(iso){
     try{
       const d=new Date(iso), now=new Date();
@@ -1529,23 +1590,39 @@ function assemble(md){
       return d.getFullYear()+'. '+(d.getMonth()+1)+'. '+d.getDate()+'.';
     }catch(_){ return ''; }
   }
+  const DL_ICON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><path d="M12 15V3"/><path d="m7 10 5 5 5-5"/><path d="M4 19v1a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-1"/></svg>';
   function renderCards(){
     renderCount();
     cardsEl.innerHTML=''; dashEmpty.hidden=docs.length>0;
-    const pages=Math.max(1,Math.ceil(docs.length/PER_PAGE));
+    const sorted=getSortedDocs();
+    const pages=Math.max(1,Math.ceil(sorted.length/PER_PAGE));
     if(page>=pages) page=pages-1; if(page<0) page=0;
-    docs.slice(page*PER_PAGE,(page+1)*PER_PAGE).forEach(d=>{
+    sorted.slice(page*PER_PAGE,(page+1)*PER_PAGE).forEach(d=>{
+      const p=PALETTES[colorIdx(d.id||'')];
       const card=document.createElement('button'); card.className='card'; card.type='button';
+      ['cb','cg','cbsp','cgsp','cbdk','cgdk'].forEach(k=>card.style.setProperty('--'+k,p[k]));
+      const bar=document.createElement('div'); bar.className='card-bar';
       const title=document.createElement('div'); title.className='card-title'; title.textContent=d.title||'제목 없음';
+      const bottom=document.createElement('div'); bottom.className='card-bottom';
       const date=document.createElement('div'); date.className='card-date'; date.textContent=fmtDate(d.created_at);
+      const dl=document.createElement('button'); dl.className='card-dl'; dl.type='button'; dl.title='다운로드'; dl.innerHTML=DL_ICON;
+      dl.addEventListener('click',ev=>downloadDoc(d,ev));
+      bottom.appendChild(date); bottom.appendChild(dl);
       const x=document.createElement('button'); x.className='card-x'; x.type='button'; x.textContent='×'; x.setAttribute('aria-label','삭제');
       x.addEventListener('click',ev=>{ ev.stopPropagation(); onDelete(d); });
-      card.appendChild(x); card.appendChild(title); card.appendChild(date);
+      card.appendChild(bar); card.appendChild(x); card.appendChild(title); card.appendChild(bottom);
       card.addEventListener('click',()=>openDoc(d));
       cardsEl.appendChild(card);
     });
     renderPager(pages);
   }
+  document.querySelectorAll('.sort-btn').forEach(btn=>{
+    btn.onclick=()=>{
+      sortMode=btn.dataset.sort; page=0;
+      document.querySelectorAll('.sort-btn').forEach(b=>b.classList.toggle('active',b===btn));
+      renderCards();
+    };
+  });
   function renderPager(pages){ pagerEl.innerHTML=''; if(pages<=1) return;
     const mk=(label,p,opt)=>{ const b=document.createElement('button'); b.textContent=label;
       if(opt&&opt.disabled) b.disabled=true; if(opt&&opt.active) b.className='active';
@@ -1583,18 +1660,22 @@ function assemble(md){
     let text='';
     try{ text=await file.text(); }catch(_){ alert('파일을 읽지 못했습니다.'); return; }
     const title=uniqueTitle(extractTitle(text,file.name));
+    const loading=$('#loading');
+    loading.querySelector('.lmsg').textContent='원고를 저장하는 중…';
+    loading.hidden=false;
     const {data:row, error}=await sb.from('documents')
       .insert({ owner_id:(CUR&&CUR.user&&CUR.user.id), title, content_md:text })
       .select().single();
+    loading.hidden=true;
     if(error){
       if(error.code==='23514' || /limit|check/i.test(error.message||'')){ renderLimit(); alert('최대 20개까지 업로드할 수 있습니다.'); }
       else alert('업로드 실패: '+error.message);
       return;
     }
-    page=0;                 // 최신이 첫 페이지 좌상단에 보이도록
+    page=0;
     await loadDocs();
     const tg=document.querySelector('#upload-open-toggle');
-    if(row && tg && tg.checked) openDoc(row);   // 토글 ON → 업로드 후 바로 뷰어로
+    if(row && tg && tg.checked) openDoc(row);
   }
   const dashFile=$('#dash-file');
   dropzone.addEventListener('click',()=>{ if(!dropzone.classList.contains('disabled')) dashFile.click(); });
