@@ -213,20 +213,29 @@
   @media (max-width:640px){.wordmark small{display:none}body.doc-open .arrow{display:none}.nav-zone{width:30%}.pop{left:8px!important;right:8px;min-width:0}.features{display:none}.land-sub{display:none}.land-mk{font-size:clamp(40px,12vw,60px)}}
   @media (max-height:540px){.land-sub{display:none}.features{display:none}}
   @media (prefers-reduced-motion:reduce){.flow,.progress .fill,.book{transition:none}.pop.open{animation:none}.viewport{scroll-behavior:auto}}
+  /* ── 반응형 레일 아이콘 ── */
+  .btn-ic{width:15px;height:15px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .btn-ic svg{width:15px;height:15px;display:block}
+  @media(max-width:660px){
+    .rail{padding:8px 10px;gap:4px}
+    .btn{padding:7px 8px}
+    .btn-label{display:none}
+    .wordmark{font-size:16px;letter-spacing:.08em;margin-right:0}
+  }
 </style>
 </head>
 <body>
 <div class="app">
   <div class="rail">
     <span class="wordmark">미리봄<small>preview</small></span>
-    <button class="btn" id="open-btn"><span class="glyph">＋</span>원고 열기</button>
+    <button class="btn" id="open-btn" title="원고 열기"><span class="btn-ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 11V2M5 5l3-3 3 3"/><path d="M2.5 11v2a.5.5 0 0 0 .5.5h10a.5.5 0 0 0 .5-.5v-2"/></svg></span><span class="btn-label">원고 열기</span></button>
     <span class="spacer"></span>
-    <button class="btn" id="info-btn" disabled>정보</button>
-    <button class="btn" id="toc-btn" disabled>목차</button>
-    <button class="btn" id="type-btn" disabled>글꼴</button>
-    <button class="btn" id="trim-btn" disabled>판형</button>
-    <button class="btn" id="view-btn" disabled>보기</button>
-    <button class="btn" id="theme-btn">테마</button>
+    <button class="btn" id="info-btn" disabled title="정보"><span class="btn-ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.5"/><line x1="8" y1="7" x2="8" y2="11"/><circle cx="8" cy="5.2" r=".7" fill="currentColor" stroke="none"/></svg></span><span class="btn-label">정보</span></button>
+    <button class="btn" id="toc-btn" disabled title="목차"><span class="btn-ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="2" y1="4" x2="14" y2="4"/><line x1="2" y1="8" x2="14" y2="8"/><line x1="2" y1="12" x2="10" y2="12"/></svg></span><span class="btn-label">목차</span></button>
+    <button class="btn" id="type-btn" disabled title="글꼴"><span class="btn-ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M2 3.5h12M8 3.5V13M5.5 13h5"/></svg></span><span class="btn-label">글꼴</span></button>
+    <button class="btn" id="trim-btn" disabled title="판형"><span class="btn-ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="1.5" width="11" height="13" rx="1.5"/><line x1="5" y1="5.5" x2="11" y2="5.5"/><line x1="5" y1="8" x2="11" y2="8"/><line x1="5" y1="10.5" x2="9" y2="10.5"/></svg></span><span class="btn-label">판형</span></button>
+    <button class="btn" id="view-btn" disabled title="보기"><span class="btn-ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x=".5" y="2" width="6.5" height="12" rx="1"/><rect x="9" y="2" width="6.5" height="12" rx="1"/></svg></span><span class="btn-label">보기</span></button>
+    <button class="btn" id="theme-btn" title="테마"><span class="btn-ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="8" cy="8" r="3"/><line x1="8" y1="1" x2="8" y2="2.5"/><line x1="8" y1="13.5" x2="8" y2="15"/><line x1="1" y1="8" x2="2.5" y2="8"/><line x1="13.5" y1="8" x2="15" y2="8"/><line x1="3.2" y1="3.2" x2="4.2" y2="4.2"/><line x1="11.8" y1="11.8" x2="12.8" y2="12.8"/><line x1="12.8" y1="3.2" x2="11.8" y2="4.2"/><line x1="4.2" y1="11.8" x2="3.2" y2="12.8"/></svg></span><span class="btn-label">테마</span></button>
   </div>
 
   <div class="stage" id="stage">
