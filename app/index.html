@@ -218,7 +218,14 @@
   .user-chip{display:inline-flex;align-items:center;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12.5px;color:var(--muted);padding:0 4px}
   .dash{position:absolute;inset:0;z-index:28;overflow:auto;background:var(--stage);-webkit-overflow-scrolling:touch}
   .dash-inner{max-width:1200px;margin:0 auto;padding:clamp(16px,3vw,36px) clamp(12px,3vw,28px) 64px}
-  .dash-greet{font-family:var(--serif);font-weight:700;font-size:clamp(18px,2.4vw,24px);color:var(--ink);margin:0 0 16px;letter-spacing:.01em}
+  .dash-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 16px}
+  .dash-greet{font-family:var(--serif);font-weight:700;font-size:clamp(18px,2.4vw,24px);color:var(--ink);margin:0;letter-spacing:.01em;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  #dash-manual{flex:0 0 auto;white-space:nowrap}
+  .dash-count{margin:0 0 14px;font-size:13.5px;color:var(--muted);font-weight:500}
+  .upload-toggle{display:none;align-items:center;gap:5px;font-size:12.5px;color:var(--muted);cursor:pointer;user-select:none;white-space:nowrap}
+  .upload-toggle input{accent-color:var(--accent);cursor:pointer;margin:0}
+  body.dash-open .upload-toggle{display:inline-flex}
+  body.dash-open #info-btn,body.dash-open #toc-btn,body.dash-open #type-btn,body.dash-open #trim-btn,body.dash-open #view-btn{display:none!important}
   .dash-upload{width:100%;height:clamp(98px,16.8vh,175px);margin:0 0 22px}
   .dash-upload.dz-hot{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
   .dash-upload.disabled{opacity:.5;cursor:not-allowed}
@@ -258,6 +265,7 @@
   <div class="rail">
     <span class="wordmark">미리봄<small>preview</small></span>
     <button class="btn" id="open-btn"><span class="glyph">＋</span>원고 열기</button>
+    <label class="upload-toggle" title="켜면 업로드 후 바로 뷰어로 이동합니다"><input type="checkbox" id="upload-open-toggle">업로드 후 열기</label>
     <span class="spacer"></span>
     <button class="btn" id="info-btn" disabled>정보</button>
     <button class="btn" id="toc-btn" disabled>목차</button>
@@ -329,13 +337,17 @@
 
     <div class="dash" id="dashboard" hidden>
       <div class="dash-inner">
-        <div class="dash-greet" id="dash-greet"></div>
+        <div class="dash-head">
+          <div class="dash-greet" id="dash-greet"></div>
+          <button class="btn" id="dash-manual">사용 설명서 보기</button>
+        </div>
         <button class="dropzone dash-upload" id="dash-dropzone" type="button" aria-label="원고 올리기">
           <span class="dz-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="m7 8 5-5 5 5"/><path d="M4 14v5a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-5"/></svg></span>
           <div class="dz-title">.md 파일을 여기로 끌어다 놓으세요</div>
           <div class="dz-sub">또는 눌러서 올리기 — 내 계정에 저장됩니다</div>
         </button>
         <div class="dash-limit" id="dash-limit" hidden>최대 20개까지 업로드할 수 있습니다.</div>
+        <div class="dash-count" id="dash-count" hidden></div>
         <div class="cards" id="cards"></div>
         <div class="dash-empty" id="dash-empty" hidden>아직 업로드 된 파일이 없어요.</div>
         <nav class="pager" id="pager"></nav>
@@ -1504,8 +1516,21 @@ function assemble(md){
   }
   function renderLimit(){ const full=docs.length>=LIMIT;
     limitEl.hidden=!full; dropzone.classList.toggle('disabled',full); }
-  function fmtDate(iso){ try{ return new Date(iso).toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric'}); }catch(_){ return ''; } }
+  function renderCount(){ const el=$('#dash-count'); if(!el) return;
+    el.hidden = docs.length===0; el.textContent = '업로드된 책이 '+docs.length+'건 있어요.'; }
+  function fmtDate(iso){
+    try{
+      const d=new Date(iso), now=new Date();
+      const sameDay=(a,b)=>a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate();
+      const yest=new Date(now); yest.setDate(now.getDate()-1);
+      if(sameDay(d,now)){ const h=d.getHours(), m=d.getMinutes(); const ap=h<12?'오전':'오후'; let h12=h%12; if(h12===0) h12=12;
+        return '오늘 '+ap+' '+h12+'시 '+m+'분'; }
+      if(sameDay(d,yest)) return '어제';
+      return d.getFullYear()+'. '+(d.getMonth()+1)+'. '+d.getDate()+'.';
+    }catch(_){ return ''; }
+  }
   function renderCards(){
+    renderCount();
     cardsEl.innerHTML=''; dashEmpty.hidden=docs.length>0;
     const pages=Math.max(1,Math.ceil(docs.length/PER_PAGE));
     if(page>=pages) page=pages-1; if(page<0) page=0;
@@ -1539,6 +1564,12 @@ function assemble(md){
 
   /* ---------- 업로드 ---------- */
   function stripExt(name){ return (name||'제목 없음').replace(/\.(md|markdown|txt)$/i,''); }
+  function uniqueTitle(base){
+    const titles=new Set(docs.map(d=>d.title));
+    if(!titles.has(base)) return base;
+    let n=2; while(titles.has(base+' ('+n+')')) n++;
+    return base+' ('+n+')';
+  }
   function extractTitle(md,filename){
     const src=md.charCodeAt(0)===0xFEFF?md.slice(1):md;
     const fm=src.match(/^---\s*\r?\n([\s\S]*?)\r?\n---/);
@@ -1551,14 +1582,19 @@ function assemble(md){
     if(docs.length>=LIMIT){ renderLimit(); alert('최대 20개까지 업로드할 수 있습니다.'); return; }
     let text='';
     try{ text=await file.text(); }catch(_){ alert('파일을 읽지 못했습니다.'); return; }
-    const title=extractTitle(text,file.name);
-    const {error}=await sb.from('documents').insert({ owner_id:(CUR&&CUR.user&&CUR.user.id), title, content_md:text });
+    const title=uniqueTitle(extractTitle(text,file.name));
+    const {data:row, error}=await sb.from('documents')
+      .insert({ owner_id:(CUR&&CUR.user&&CUR.user.id), title, content_md:text })
+      .select().single();
     if(error){
       if(error.code==='23514' || /limit|check/i.test(error.message||'')){ renderLimit(); alert('최대 20개까지 업로드할 수 있습니다.'); }
       else alert('업로드 실패: '+error.message);
       return;
     }
+    page=0;                 // 최신이 첫 페이지 좌상단에 보이도록
     await loadDocs();
+    const tg=document.querySelector('#upload-open-toggle');
+    if(row && tg && tg.checked) openDoc(row);   // 토글 ON → 업로드 후 바로 뷰어로
   }
   const dashFile=$('#dash-file');
   dropzone.addEventListener('click',()=>{ if(!dropzone.classList.contains('disabled')) dashFile.click(); });
@@ -1567,6 +1603,11 @@ function assemble(md){
     if(!dropzone.classList.contains('disabled')) dropzone.classList.add('dz-hot'); }));
   ['dragleave','drop'].forEach(ev=>dash.addEventListener(ev,e=>{ e.preventDefault(); e.stopPropagation(); dropzone.classList.remove('dz-hot'); }));
   dash.addEventListener('drop',e=>{ const f=e.dataTransfer&&e.dataTransfer.files[0]; if(f) handleUpload(f); });
+
+  /* ---------- 사용 설명서 보기 (대시보드) ---------- */
+  const manualBtn=$('#dash-manual');
+  if(manualBtn) manualBtn.onclick=()=>{ const s=document.getElementById('sample-doc');
+    if(s){ hideDashboard(); if(V.loadManuscript) V.loadManuscript(s.textContent); } };
 
   /* ---------- 로고: 상태별 이동 ---------- */
   const wm=document.querySelector('.wordmark');
