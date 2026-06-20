@@ -121,8 +121,8 @@
   .stage:hover .arrow{opacity:1}
   .arrow:hover{border-color:var(--accent)}.arrow:focus-visible{outline:2px solid var(--accent);opacity:1}
   .arrow.left{left:14px}.arrow.right{right:14px}.arrow:disabled{opacity:.12;cursor:default}
-  .progress{position:absolute;left:0;right:0;bottom:0;height:34px;z-index:8;display:flex;align-items:center;gap:12px;padding:0 22px;pointer-events:none}
-  .progress .track{flex:1;height:3px;border-radius:3px;background:var(--line);overflow:hidden}
+  .progress{position:absolute;left:0;right:0;bottom:0;height:34px;z-index:8;display:flex;align-items:center;gap:12px;padding:0 22px;pointer-events:none;background:linear-gradient(transparent,color-mix(in srgb,var(--stage) 72%,transparent))}
+  .progress .track{flex:1;height:3px;border-radius:3px;background:color-mix(in srgb,var(--ink) 14%,transparent);overflow:hidden}
   .progress .fill{height:100%;width:0;background:var(--accent);transition:width .34s}
   .progress .label{font-size:11px;color:var(--muted);letter-spacing:.06em;min-width:72px;text-align:right}
 
