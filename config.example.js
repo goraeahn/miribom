@@ -15,5 +15,6 @@
 // ============================================================================
 window.MIRIBOM_CONFIG = {
   SUPABASE_URL: "",      // .env 의 SUPABASE_URL 과 동일
+  // 공개 키. 신규 프로젝트의 "publishable key"(sb_publishable_...) = 예전 anon key.
   SUPABASE_ANON_KEY: "", // .env 의 SUPABASE_ANON_KEY 와 동일(공개 가능)
 };
