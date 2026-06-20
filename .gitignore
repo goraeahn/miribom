@@ -2,7 +2,7 @@
 .env
 .env.local
 .env.*.local
-config.js
+# config.js 는 anon(publishable) key 만 담으므로 커밋 허용
 
 # ── 민감 콘텐츠 (미발표 창작 원고 — 공개 금지) ─────────────────
 메아리_검증픽스처.md
