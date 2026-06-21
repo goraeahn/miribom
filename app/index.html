@@ -2461,7 +2461,7 @@ function assemble(md){
     if(error || !data || !data.ok){ hideLoading(); showExpired(); return; }
     setCookie(name);
     hideLoading();
-    if(V.loadManuscript) V.loadManuscript(data.content_md||''); else showExpired();
+    if(V.loadManuscript){ const _cu=data.cover_path?sb.storage.from('covers').getPublicUrl(data.cover_path).data.publicUrl:''; V.loadManuscript(data.content_md||'', _cu); } else showExpired();
   }
 
   // 진입: 유효성 먼저 확인 → 만료/이름입력 분기 (쿠키 있으면 이름 생략하고 바로 입장)
