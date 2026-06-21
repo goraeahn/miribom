@@ -2006,7 +2006,7 @@ function assemble(md){
     loading.querySelector('.lmsg').textContent='원고 목록을 불러오는 중…';
     loading.hidden=false;
     const {data,error}=await sb.from('documents')
-      .select('id,title,content_md,created_at,cover_path,cover_thumb_path').order('created_at',{ascending:false});
+      .select('id,title,content_md,created_at,updated_at,cover_path,cover_thumb_path').order('created_at',{ascending:false});
     loading.hidden=true;
     docs = error ? [] : (data||[]);
     if(error) console.warn('loadDocs',error);
@@ -2046,7 +2046,7 @@ function assemble(md){
       card.style.setProperty('--cv-bg', COVER_PAL[colorIdx(d.id||'')]); card.style.setProperty('--cv-ink', COVER_INK);
       const dateStr=fmtUpload(d.created_at);
       if(d.cover_thumb_path){
-        const img=document.createElement('img'); img.className='card-img'; img.alt=''; img.loading='lazy'; img.src=coverUrl(d.cover_thumb_path);
+        const img=document.createElement('img'); img.className='card-img'; img.alt=''; img.loading='lazy'; img.src=coverUrl(d.cover_thumb_path, d.updated_at?new Date(d.updated_at).getTime():'');
         const scrim=document.createElement('div'); scrim.className='card-scrim';
         const meta=document.createElement('div'); meta.className='cv-meta-img';
         const ti=document.createElement('div'); ti.className='cv-title-img'; ti.textContent=d.title||'제목 없음'; meta.appendChild(ti);
@@ -2128,7 +2128,7 @@ function assemble(md){
   /* ---------- 표지(cover) 업로드/교체/제거 ---------- */
   const coverFileInput=$('#cover-file'); let coverTargetDoc=null; let toastTimer=0;
   function toast(msg){ const t=$('#toast'); if(!t) return; t.textContent=msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),2200); }
-  function coverUrl(path){ return sb.storage.from('covers').getPublicUrl(path).data.publicUrl; }
+  function coverUrl(path,ver){ const u=sb.storage.from('covers').getPublicUrl(path).data.publicUrl; return ver?u+'?v='+ver:u; }
   function resizeImage(file,maxEdge){ return new Promise((res,rej)=>{
     const img=new Image(); const u=URL.createObjectURL(file);
     img.onload=()=>{ URL.revokeObjectURL(u);
@@ -2153,10 +2153,10 @@ function assemble(md){
       const base=CUR.user.id+'/'+d.id, dispPath=base+'/display.jpg', thumbPath=base+'/thumb.jpg';
       let r=await sb.storage.from('covers').upload(dispPath,disp,{upsert:true,contentType:'image/jpeg'}); if(r.error) throw r.error;
       r=await sb.storage.from('covers').upload(thumbPath,thumb,{upsert:true,contentType:'image/jpeg'}); if(r.error) throw r.error;
-      const {error}=await sb.from('documents').update({cover_path:dispPath,cover_thumb_path:thumbPath}).eq('id',d.id); if(error) throw error;
+      const {error}=await sb.from('documents').update({cover_path:dispPath,cover_thumb_path:thumbPath,updated_at:new Date().toISOString()}).eq('id',d.id); if(error) throw error;
       await loadDocs();
       toast(isReplace?'표지를 바꿨어요':'표지를 올렸어요');
-    }catch(e){ toast('표지 적용에 실패했어요'); }
+    }catch(e){ console.warn('표지 업로드 실패', e); toast('표지 적용에 실패했어요'); }
   });
   async function onRemoveCover(d){
     if(!window.confirm('표지를 제거하고 자동 표지로 되돌릴까요?')) return;
