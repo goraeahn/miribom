@@ -231,7 +231,7 @@
   .upload-toggle input:checked+.toggle-track::after{transform:translateX(14px)}
   body.dash-open .upload-toggle{display:inline-flex}
   body.dash-open #info-btn,body.dash-open #toc-btn,body.dash-open #display-btn{display:none!important}
-  .dash-upload{width:100%;height:auto;margin:0 0 16px;flex-direction:row;justify-content:flex-start;align-items:center;gap:14px;padding:13px 16px;text-align:left;background-image:none}
+  .dash-upload{width:100%;height:auto;min-height:82px;margin:0 0 16px;flex-direction:row;justify-content:flex-start;align-items:center;gap:14px;padding:16px 18px;text-align:left}
   .dz-text{display:flex;flex-direction:column;gap:2px}
   .dash-upload.dz-hot{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
   .dash-upload.disabled{opacity:.5;cursor:not-allowed}
@@ -277,6 +277,7 @@
   .dash-foot a{color:var(--muted);text-decoration:underline;text-underline-offset:2px}
   /* v2: 2단 — 본문 + 우측 사이드 메뉴 */
   .dash-main{min-width:0}
+  #lib-view{max-width:800px}
   .dash-side{display:flex;flex-direction:column;gap:16px;min-width:0}
   .side-nav{display:flex;flex-direction:column;gap:1px}
   .side-link{display:block;width:100%;text-align:left;background:none;border:none;font-family:var(--ui);font-size:14px;color:#666;padding:8px 10px;border-radius:8px;cursor:pointer;transition:background .14s,color .14s}
@@ -286,7 +287,7 @@
   .side-box a{color:var(--muted);text-decoration:underline;text-underline-offset:2px}
   .side-box-contact{margin-top:5px}
   /* 콘텐츠 아티클 페이지 */
-  .doc-page{font-family:var(--ui);color:var(--ink);font-size:15px;line-height:1.78;max-width:680px;padding-bottom:20px}
+  .doc-page{font-family:var(--ui);color:var(--ink);font-size:15px;line-height:1.78;max-width:800px;padding-bottom:20px}
   .doc-page h1{font-family:var(--serif);font-size:clamp(23px,3.2vw,29px);font-weight:700;letter-spacing:.01em;margin:0 0 18px}
   .doc-page h2{font-size:19px;font-weight:600;margin:32px 0 11px}
   .doc-page h3{font-size:16px;font-weight:600;margin:22px 0 7px}
@@ -530,7 +531,6 @@
           <div id="lib-view">
             <div class="dash-head">
               <div class="dash-greet" id="dash-greet"></div>
-              <button class="btn solid" id="dash-manual">사용 설명서 보기</button>
             </div>
             <button class="dropzone dash-upload" id="dash-dropzone" type="button" aria-label="원고 올리기">
               <span class="dz-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="m7 8 5-5 5 5"/><path d="M4 14v5a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-5"/></svg></span>
