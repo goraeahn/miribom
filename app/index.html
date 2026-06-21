@@ -20,8 +20,8 @@
   :root[data-theme="night"]{--stage:#131217;--sheet:#1F1E25;--ink:#c9c6cf;--muted:#75717d;--rule:#2d2c34;--accent:#8fa0c8;--shadow:rgba(0,0,0,.55);--rail:#191820;--panel:#26242d;--line:#2d2c34}
   *{box-sizing:border-box}
   html,body{height:100%}
-  body{margin:0;font-family:var(--ui);color:var(--ink);background:var(--stage);overflow:hidden;-webkit-font-smoothing:antialiased;transition:background .4s,color .4s}
-  .app{display:flex;flex-direction:column;height:100vh}
+  body{margin:0;font-family:var(--ui);color:var(--ink);background:var(--stage);overflow:hidden;overscroll-behavior:none;-webkit-font-smoothing:antialiased;transition:background .4s,color .4s}
+  .app{display:flex;flex-direction:column;height:100vh;height:100dvh}
 
   .rail{display:flex;align-items:center;gap:8px;padding:10px 16px;background:var(--rail);border-bottom:1px solid var(--line);z-index:30;flex:0 0 auto;transition:background .4s,border-color .4s}
   .wordmark{font-family:var(--serif);font-weight:500;font-size:19px;letter-spacing:.12em;margin-right:6px;user-select:none;cursor:pointer}
@@ -34,7 +34,7 @@
   .btn.solid{background:var(--accent);color:#fff;border-color:var(--accent)}
   .btn .glyph{font-size:15px;line-height:1}
 
-  .stage{position:relative;flex:1 1 auto;min-height:0;display:flex;align-items:center;justify-content:center;padding:26px;overflow:hidden}
+  .stage{position:relative;flex:1 1 auto;min-height:0;display:flex;align-items:center;justify-content:center;padding:26px;overflow:hidden;touch-action:manipulation}
   .book{position:relative;background:var(--sheet);box-shadow:0 18px 50px -20px var(--shadow),0 2px 8px -4px var(--shadow);border-radius:3px;overflow:hidden;transition:background .4s}
   .book::after{content:"";position:absolute;inset:0;border-radius:3px;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ink) 6%,transparent);pointer-events:none}
   .page-head,.page-foot{position:absolute;left:0;right:0;display:flex;align-items:center;color:var(--muted);font-family:var(--ui);pointer-events:none;padding:0 var(--padr) 0 var(--padl);z-index:2}
@@ -378,14 +378,14 @@
   body.chrome-hidden .progress .label{display:none}
   body.chrome-hidden .progress .track{height:2px;border-radius:0}
   /* 통합 보기 패널: 폭 고정 + 길면 데스크탑에서도 스크롤 */
-  .pop-display{width:300px;max-height:calc(100vh - 72px);overflow:auto}
+  .pop-display{width:300px;max-height:calc(100vh - 72px);max-height:calc(100dvh - 72px);overflow:auto}
   .pop-note{font-size:11.5px;color:var(--muted);margin:7px 0 2px;line-height:1.5}
   /* 모바일: 설정 창을 하단 시트로 통일 (위치·크기 들쑥날쑥 해소) */
   #pop-scrim{position:fixed;inset:0;z-index:39;background:rgba(0,0,0,.34);opacity:0;pointer-events:none;transition:opacity .2s}
   @media (max-width:640px){
     body.pop-open #pop-scrim{opacity:1;pointer-events:auto}
     .pop{position:fixed!important;left:0!important;right:0!important;bottom:0!important;top:auto!important;width:auto!important;
-         min-width:0;max-height:80vh;overflow:auto;border-radius:18px 18px 0 0;padding:6px 18px 22px;
+         min-width:0;max-height:80vh;max-height:80dvh;overflow:auto;border-radius:18px 18px 0 0;padding:6px 18px 22px;
          box-shadow:0 -22px 60px -18px var(--shadow)}
     .pop.open{animation:sheet .24s cubic-bezier(.22,1,.36,1)}
     .pop::before{content:"";display:block;width:40px;height:4px;border-radius:2px;background:var(--line);margin:6px auto 12px}
@@ -396,7 +396,7 @@
   /* ===== 모바일 읽기: 박스 없는 풀화면 페이지넘김 ===== */
   @media (max-width:640px){
     body.doc-open .stage{padding:0;background:var(--sheet)}
-    body.doc-open .book{box-shadow:none;border-radius:0}
+    body.doc-open .book{box-shadow:none;border-radius:0;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
     body.doc-open .book::after{display:none}
     body.doc-open .page-head,body.doc-open .page-foot{display:none}
     body.doc-open .chrome-toggle{display:none}
