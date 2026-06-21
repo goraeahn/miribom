@@ -118,6 +118,10 @@
   /* 부제·소개: 제목 바로 밑 · 명조 · 볼드 아님 · 옅은 색 · 아담한 크기 */
   .book-bleed .bl-sub{font-family:var(--serif);font-weight:400;font-size:clamp(15px,2.4vw,21px);line-height:1.4;letter-spacing:.01em;opacity:.62;max-width:24ch;word-break:keep-all}
   .book-bleed.img .bl-sub{opacity:.92}
+  /* 자동표지 입체 그라데이션: 빛(좌상)+가장자리 음영. 글자(z2) 아래 겹(z1) */
+  .book-bleed.auto::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:radial-gradient(120% 95% at 30% 18%,rgba(255,255,255,.12),rgba(255,255,255,0) 50%),radial-gradient(135% 120% at 50% 46%,rgba(0,0,0,0) 50%,rgba(0,0,0,.26)),linear-gradient(150deg,rgba(255,255,255,.06),rgba(0,0,0,0) 42%,rgba(0,0,0,.32))}
+  /* 책등 그림자: 한 면 보기에서만(펼침 보기는 책등이 가운데라 생략) */
+  .book:not(.spread) .book-bleed.auto::before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(90deg,rgba(0,0,0,.34),rgba(0,0,0,0) 7%)}
   .flow .sp-footnotes .fnlist{font-size:.9em;color:var(--muted);margin-left:1.2em}
   .flow .sp-footnotes li{margin:.3em 0}
   /* 자동 목차 */
@@ -262,6 +266,8 @@
   .card:hover{box-shadow:0 16px 40px -22px var(--shadow);transform:translateY(-2px)}
   .card:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   .card-cover{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(7px,2.4cqw,12px);padding:14% 12%;color:var(--cv-ink,#ECE4D2)}
+  /* 카드 자동표지도 뷰어와 같은 입체 그라데이션(책등 포함). 이미지 카드는 제외 */
+  .card:has(.card-cover){background:linear-gradient(90deg,rgba(0,0,0,.32),rgba(0,0,0,0) 8%),radial-gradient(120% 95% at 30% 18%,rgba(255,255,255,.12),rgba(255,255,255,0) 50%),radial-gradient(135% 120% at 50% 46%,rgba(0,0,0,0) 50%,rgba(0,0,0,.26)),linear-gradient(150deg,rgba(255,255,255,.06),rgba(0,0,0,0) 42%,rgba(0,0,0,.32)),var(--cv-bg,#2C2B52)}
   .cv-rule{width:clamp(18px,8cqw,30px);height:2px;background:currentColor;opacity:.5}
   .cv-title{font-family:var(--serif);font-weight:500;font-size:clamp(14px,5.4cqw,21px);line-height:1.32;letter-spacing:.01em;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;word-break:keep-all}
   .cv-author{font-size:clamp(10px,3.4cqw,13px);opacity:.66;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
