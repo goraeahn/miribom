@@ -254,6 +254,7 @@
   .ov-btn:hover{background:rgba(255,255,255,.17);border-color:rgba(255,255,255,.4)}
   .ov-btn.danger:hover{background:#d9534f;border-color:#d9534f}
   .ov-btn svg{width:17px;height:17px;flex:0 0 auto}
+  .ov-btn.full{grid-column:1 / -1;flex-direction:row;gap:7px;padding:8px 6px}
   .card-menu{position:absolute;top:7px;right:7px;z-index:2;width:28px;height:28px;border-radius:8px;border:none;background:rgba(18,17,22,.42);color:#fff;font-size:17px;line-height:1;cursor:pointer;display:none;align-items:center;justify-content:center;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
   @media (hover:hover){.card:hover .card-ov,.card:focus-within .card-ov{opacity:1;pointer-events:auto}}
   @media (hover:none){.card-menu{display:flex}.card.menu-open .card-ov{opacity:1;pointer-events:auto}}
@@ -1804,11 +1805,12 @@ function assemble(md){
       if(au){ const ae=document.createElement('div'); ae.className='cv-author'; ae.textContent=au; cover.appendChild(ae); }
       card.appendChild(cover);
       const ov=document.createElement('div'); ov.className='card-ov';
-      const ovBtn=(label,svg,fn,danger)=>{ const b=document.createElement('button'); b.type='button'; b.className='ov-btn'+(danger?' danger':''); b.innerHTML=svg+'<span>'+label+'</span>'; b.addEventListener('click',ev=>{ ev.stopPropagation(); fn(); }); return b; };
+      const ovBtn=(label,svg,fn,danger,full)=>{ const b=document.createElement('button'); b.type='button'; b.className='ov-btn'+(danger?' danger':'')+(full?' full':''); b.innerHTML=svg+'<span>'+label+'</span>'; b.addEventListener('click',ev=>{ ev.stopPropagation(); fn(); }); return b; };
       ov.appendChild(ovBtn('뷰어',VIEW_ICON,()=>openDoc(d)));
       ov.appendChild(ovBtn('표지',IMG_ICON,()=>onSetCover(d)));
       ov.appendChild(ovBtn('공유',SHARE_ICON,()=>openShareModal(d)));
       ov.appendChild(ovBtn('삭제',TRASH_ICON,()=>onDelete(d),true));
+      ov.appendChild(ovBtn('다운로드',DL_ICON,()=>downloadDoc(d,{stopPropagation(){}}),false,true));
       card.appendChild(ov);
       const menu=document.createElement('button'); menu.type='button'; menu.className='card-menu'; menu.setAttribute('aria-label','메뉴'); menu.textContent='⋯';
       menu.addEventListener('click',ev=>{ ev.stopPropagation(); document.querySelectorAll('.card.menu-open').forEach(c=>{ if(c!==card) c.classList.remove('menu-open'); }); card.classList.toggle('menu-open'); });
