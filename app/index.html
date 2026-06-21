@@ -231,8 +231,9 @@
   .upload-toggle input:checked+.toggle-track::after{transform:translateX(14px)}
   body.dash-open .upload-toggle{display:inline-flex}
   body.dash-open #info-btn,body.dash-open #toc-btn,body.dash-open #display-btn{display:none!important}
-  .dash-upload{width:100%;height:auto;min-height:82px;margin:0 0 16px;flex-direction:row;justify-content:flex-start;align-items:center;gap:14px;padding:16px 18px;text-align:left}
-  .dz-text{display:flex;flex-direction:column;gap:2px}
+  .dash-upload{width:100%;height:auto;min-height:82px;margin:0 0 16px;position:relative;padding:16px 18px}
+  .dz-text{display:flex;flex-direction:column;gap:2px;text-align:center}
+  .dash-upload .dz-ic{position:absolute;left:18px;top:50%;transform:translateY(-50%)}
   .dash-upload.dz-hot{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
   .dash-upload.disabled{opacity:.5;cursor:not-allowed}
   .dash-limit{margin:-8px 0 18px;font-size:13px;color:var(--accent);text-align:center}
