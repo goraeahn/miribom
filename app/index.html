@@ -581,6 +581,7 @@
 </div>
 
 <input type="file" id="dash-file" accept=".md,.markdown,.txt,text/markdown,text/plain" hidden>
+<input type="file" id="cover-file" accept="image/jpeg,image/png,image/webp" hidden>
 
 <div class="pop" id="pop-info" style="right:16px">
   <h4>원고 정보</h4>
@@ -1761,7 +1762,7 @@ function assemble(md){
     loading.querySelector('.lmsg').textContent='원고 목록을 불러오는 중…';
     loading.hidden=false;
     const {data,error}=await sb.from('documents')
-      .select('id,title,content_md,created_at').order('created_at',{ascending:false});
+      .select('id,title,content_md,created_at,cover_path,cover_thumb_path').order('created_at',{ascending:false});
     loading.hidden=true;
     docs = error ? [] : (data||[]);
     if(error) console.warn('loadDocs',error);
@@ -1788,6 +1789,7 @@ function assemble(md){
   const VIEW_ICON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>';
   const IMG_ICON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>';
   const TRASH_ICON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2m2 0v14a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V6"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>';
+  const XMARK_ICON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m15 9-6 6M9 9l6 6"/></svg>';
   function renderCards(){
     renderCount();
     cardsEl.innerHTML=''; dashEmpty.hidden=docs.length>0;
@@ -1797,20 +1799,28 @@ function assemble(md){
     sorted.slice(page*PER_PAGE,(page+1)*PER_PAGE).forEach(d=>{
       const card=document.createElement('div'); card.className='card'; card.setAttribute('role','button'); card.tabIndex=0;
       card.style.setProperty('--cv-bg', COVER_PAL[colorIdx(d.id||'')]); card.style.setProperty('--cv-ink', COVER_INK);
-      const cover=document.createElement('div'); cover.className='card-cover';
-      const rule=document.createElement('div'); rule.className='cv-rule';
-      const ttl=document.createElement('div'); ttl.className='cv-title'; ttl.textContent=d.title||'제목 없음';
-      cover.appendChild(rule); cover.appendChild(ttl);
-      const au=metaVal(d.content_md,'author');
-      if(au){ const ae=document.createElement('div'); ae.className='cv-author'; ae.textContent=au; cover.appendChild(ae); }
-      card.appendChild(cover);
+      if(d.cover_thumb_path){
+        const img=document.createElement('img'); img.className='card-img'; img.alt=''; img.loading='lazy'; img.src=coverUrl(d.cover_thumb_path);
+        const scrim=document.createElement('div'); scrim.className='card-scrim';
+        const ti=document.createElement('div'); ti.className='cv-title-img'; ti.textContent=d.title||'제목 없음';
+        card.appendChild(img); card.appendChild(scrim); card.appendChild(ti);
+      } else {
+        const cover=document.createElement('div'); cover.className='card-cover';
+        const rule=document.createElement('div'); rule.className='cv-rule';
+        const ttl=document.createElement('div'); ttl.className='cv-title'; ttl.textContent=d.title||'제목 없음';
+        cover.appendChild(rule); cover.appendChild(ttl);
+        const au=metaVal(d.content_md,'author');
+        if(au){ const ae=document.createElement('div'); ae.className='cv-author'; ae.textContent=au; cover.appendChild(ae); }
+        card.appendChild(cover);
+      }
       const ov=document.createElement('div'); ov.className='card-ov';
       const ovBtn=(label,svg,fn,danger,full)=>{ const b=document.createElement('button'); b.type='button'; b.className='ov-btn'+(danger?' danger':'')+(full?' full':''); b.innerHTML=svg+'<span>'+label+'</span>'; b.addEventListener('click',ev=>{ ev.stopPropagation(); fn(); }); return b; };
       ov.appendChild(ovBtn('뷰어',VIEW_ICON,()=>openDoc(d)));
-      ov.appendChild(ovBtn('표지',IMG_ICON,()=>onSetCover(d)));
+      ov.appendChild(ovBtn(d.cover_thumb_path?'표지 교체':'표지',IMG_ICON,()=>onSetCover(d)));
       ov.appendChild(ovBtn('공유',SHARE_ICON,()=>openShareModal(d)));
       ov.appendChild(ovBtn('삭제',TRASH_ICON,()=>onDelete(d),true));
       ov.appendChild(ovBtn('다운로드',DL_ICON,()=>downloadDoc(d,{stopPropagation(){}}),false,true));
+      if(d.cover_thumb_path) ov.appendChild(ovBtn('표지 제거',XMARK_ICON,()=>onRemoveCover(d),false,true));
       card.appendChild(ov);
       const menu=document.createElement('button'); menu.type='button'; menu.className='card-menu'; menu.setAttribute('aria-label','메뉴'); menu.textContent='⋯';
       menu.addEventListener('click',ev=>{ ev.stopPropagation(); document.querySelectorAll('.card.menu-open').forEach(c=>{ if(c!==card) c.classList.remove('menu-open'); }); card.classList.toggle('menu-open'); });
@@ -1839,11 +1849,49 @@ function assemble(md){
   function openDoc(d){ hideDashboard(); if(V.loadManuscript) V.loadManuscript(d.content_md||''); }
   async function onDelete(d){
     if(!window.confirm('이 원고를 삭제할까요?\n\n"'+(d.title||'제목 없음')+'"')) return;
+    const paths=[d.cover_path,d.cover_thumb_path].filter(Boolean);
+    if(paths.length){ try{ await sb.storage.from('covers').remove(paths); }catch(_){} }
     const {error}=await sb.from('documents').delete().eq('id',d.id);
     if(error){ alert('삭제 실패: '+error.message); return; }
     await loadDocs();
   }
-  function onSetCover(d){ alert('표지(썸네일) 넣기는 다음 업데이트에서 켜집니다.'); }
+  /* ---------- 표지(cover) 업로드/교체/제거 ---------- */
+  const coverFileInput=$('#cover-file'); let coverTargetDoc=null;
+  function coverUrl(path){ return sb.storage.from('covers').getPublicUrl(path).data.publicUrl; }
+  function resizeImage(file,maxEdge){ return new Promise((res,rej)=>{
+    const img=new Image(); const u=URL.createObjectURL(file);
+    img.onload=()=>{ URL.revokeObjectURL(u);
+      let w=img.naturalWidth,h=img.naturalHeight; const long=Math.max(w,h);
+      if(long>maxEdge){ const k=maxEdge/long; w=Math.round(w*k); h=Math.round(h*k); }
+      const cv=document.createElement('canvas'); cv.width=w; cv.height=h;
+      const cx=cv.getContext('2d'); cx.imageSmoothingQuality='high'; cx.drawImage(img,0,0,w,h);
+      cv.toBlob(b=>b?res(b):rej(new Error('이미지 변환 실패')),'image/jpeg',0.85);
+    };
+    img.onerror=()=>{ URL.revokeObjectURL(u); rej(new Error('이미지를 열 수 없습니다')); };
+    img.src=u;
+  }); }
+  function onSetCover(d){ if(!coverFileInput) return; coverTargetDoc=d; coverFileInput.value=''; coverFileInput.click(); }
+  if(coverFileInput) coverFileInput.addEventListener('change',async()=>{
+    const file=coverFileInput.files&&coverFileInput.files[0]; const d=coverTargetDoc; if(!file||!d) return;
+    if(!/^image\/(jpeg|png|webp)$/.test(file.type)){ alert('jpg, png, webp 이미지만 올릴 수 있어요.'); return; }
+    if(file.size>15*1024*1024){ alert('이미지가 너무 큽니다 (최대 15MB).'); return; }
+    try{
+      const [disp,thumb]=await Promise.all([resizeImage(file,1600),resizeImage(file,500)]);
+      const base=CUR.user.id+'/'+d.id, dispPath=base+'/display.jpg', thumbPath=base+'/thumb.jpg';
+      let r=await sb.storage.from('covers').upload(dispPath,disp,{upsert:true,contentType:'image/jpeg'}); if(r.error) throw r.error;
+      r=await sb.storage.from('covers').upload(thumbPath,thumb,{upsert:true,contentType:'image/jpeg'}); if(r.error) throw r.error;
+      const {error}=await sb.from('documents').update({cover_path:dispPath,cover_thumb_path:thumbPath}).eq('id',d.id); if(error) throw error;
+      await loadDocs();
+    }catch(e){ alert('표지 업로드 실패: '+(e.message||e)); }
+  });
+  async function onRemoveCover(d){
+    if(!window.confirm('표지를 제거하고 자동 표지로 되돌릴까요?')) return;
+    const paths=[d.cover_path,d.cover_thumb_path].filter(Boolean);
+    if(paths.length){ try{ await sb.storage.from('covers').remove(paths); }catch(_){} }
+    const {error}=await sb.from('documents').update({cover_path:null,cover_thumb_path:null}).eq('id',d.id);
+    if(error){ alert('표지 제거 실패: '+error.message); return; }
+    await loadDocs();
+  }
 
   /* ---------- 업로드 ---------- */
   function stripExt(name){ return (name||'제목 없음').replace(/\.(md|markdown|txt)$/i,''); }
