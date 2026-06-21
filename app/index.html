@@ -220,7 +220,7 @@
   .dash{position:absolute;inset:0;z-index:28;overflow:auto;background:var(--stage);-webkit-overflow-scrolling:touch;touch-action:manipulation}
   .dash-inner{max-width:900px;margin:0 auto;padding:clamp(16px,3vw,36px) clamp(12px,3vw,28px) 64px}
   .dash-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 16px}
-  .dash-greet{font-family:var(--serif);font-weight:700;font-size:clamp(18px,2.4vw,24px);color:var(--ink);margin:0;letter-spacing:.01em;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .dash-greet{font-family:var(--ui);font-weight:500;font-size:clamp(14px,1.7vw,17px);color:var(--ink);margin:0;letter-spacing:.01em;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   #dash-manual{flex:0 0 auto;white-space:nowrap}
   .dash-count{font-size:13.5px;color:var(--muted);font-weight:500}
   .upload-toggle{display:none;align-items:center;gap:7px;font-size:12.5px;color:var(--muted);cursor:pointer;user-select:none;white-space:nowrap}
@@ -231,7 +231,7 @@
   .upload-toggle input:checked+.toggle-track::after{transform:translateX(14px)}
   body.dash-open .upload-toggle{display:inline-flex}
   body.dash-open #info-btn,body.dash-open #toc-btn,body.dash-open #display-btn{display:none!important}
-  .dash-upload{width:100%;height:clamp(98px,16.8vh,175px);margin:0 0 22px}
+  .dash-upload{width:100%;height:clamp(60px,12vh,135px);margin:0 0 22px}
   .dash-upload.dz-hot{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
   .dash-upload.disabled{opacity:.5;cursor:not-allowed}
   .dash-limit{margin:-8px 0 18px;font-size:13px;color:var(--accent);text-align:center}
@@ -247,12 +247,12 @@
   .cv-title{font-family:var(--serif);font-weight:500;font-size:clamp(14px,5.4cqw,21px);line-height:1.32;letter-spacing:.01em;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;word-break:keep-all}
   .cv-author{font-size:clamp(10px,3.4cqw,13px);opacity:.66;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .card-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-  .card-scrim{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.64),rgba(0,0,0,.12) 44%,transparent 72%)}
+  .card-scrim{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.82),rgba(0,0,0,.28) 46%,transparent 78%)}
   .cv-meta-img{position:absolute;left:0;right:0;bottom:0;padding:11% 11% 9%;text-align:left}
   .cv-title-img{color:#fff;font-family:var(--serif);font-weight:500;font-size:clamp(14px,5.4cqw,21px);line-height:1.3;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;word-break:keep-all;text-shadow:0 1px 8px rgba(0,0,0,.5)}
   .cv-date-img{margin-top:3px;font-family:var(--ui);font-size:clamp(9px,2.8cqw,11px);color:#fff;opacity:.8;text-shadow:0 1px 6px rgba(0,0,0,.5)}
-  .cv-date{position:absolute;left:0;right:0;bottom:clamp(7px,3.4cqw,13px);text-align:center;font-family:var(--ui);font-size:clamp(9px,2.8cqw,11px);color:var(--cv-ink,#ECE4D2);opacity:.5;letter-spacing:.02em}
-  .cv-sheets{position:absolute;top:7px;right:7px;z-index:1;display:flex;align-items:center;gap:3px;font-family:var(--ui);font-size:clamp(9px,2.7cqw,11px);font-weight:500;color:#fff;background:rgba(18,17,22,.4);padding:3px 7px 3px 5px;border-radius:8px}
+  .cv-date{position:absolute;left:0;right:0;bottom:clamp(13px,5cqw,19px);text-align:center;font-family:var(--ui);font-size:clamp(9px,2.8cqw,11px);color:var(--cv-ink,#ECE4D2);opacity:.5;letter-spacing:.02em}
+  .cv-sheets{position:absolute;top:7px;right:7px;z-index:1;display:flex;align-items:center;gap:3px;font-family:var(--ui);font-size:clamp(9px,2.7cqw,11px);font-weight:500;color:rgba(255,255,255,.6);background:rgba(18,17,22,.46);padding:3px 7px 3px 5px;border-radius:8px}
   .cv-sheets svg{width:12px;height:12px;flex:0 0 auto}
   .card-ov{position:absolute;inset:0;z-index:1;background:rgba(18,17,22,.6);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);display:grid;grid-template-columns:1fr 1fr;gap:7px;padding:clamp(10px,4.5cqw,16px);align-content:center;opacity:0;pointer-events:none;transition:opacity .16s}
   .ov-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;border:1px solid rgba(255,255,255,.22);border-radius:10px;background:rgba(255,255,255,.08);color:#fff;font-family:inherit;font-size:clamp(10px,3.3cqw,12px);padding:clamp(7px,3.4cqw,12px) 4px;cursor:pointer;transition:background .14s,border-color .14s}
@@ -263,6 +263,8 @@
   .card-menu{position:absolute;top:7px;left:7px;z-index:2;width:28px;height:28px;border-radius:8px;border:none;background:rgba(18,17,22,.42);color:#fff;font-size:17px;line-height:1;cursor:pointer;display:none;align-items:center;justify-content:center;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
   @media (hover:hover){.card:hover .card-ov,.card:focus-within .card-ov{opacity:1;pointer-events:auto}}
   @media (hover:none){.card-menu{display:flex}.card.menu-open .card-ov{opacity:1;pointer-events:auto}}
+  .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(10px);background:rgba(18,17,22,.95);color:#fff;font-family:var(--ui);font-size:13px;padding:10px 16px;border-radius:10px;z-index:60;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;box-shadow:0 8px 30px -10px rgba(0,0,0,.5)}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
   .dash-empty{text-align:center;color:var(--muted);padding:40px 16px;font-size:14px;border:1.5px solid color-mix(in srgb,var(--muted) 22%,transparent);border-radius:14px;background:transparent}
   .cards-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 14px;flex-wrap:wrap}
   .dash-count{font-size:13.5px;color:var(--muted);font-weight:500}
@@ -491,7 +493,7 @@
       <div class="dash-inner">
         <div class="dash-head">
           <div class="dash-greet" id="dash-greet"></div>
-          <button class="btn" id="dash-manual">사용 설명서 보기</button>
+          <button class="btn solid lg" id="dash-manual">사용 설명서 보기</button>
         </div>
         <button class="dropzone dash-upload" id="dash-dropzone" type="button" aria-label="원고 올리기">
           <span class="dz-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="m7 8 5-5 5 5"/><path d="M4 14v5a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-5"/></svg></span>
@@ -505,7 +507,6 @@
             <button class="sort-btn active" data-sort="newest">최신순</button>
             <button class="sort-btn" data-sort="oldest">오래된순</button>
             <button class="sort-btn" data-sort="korean">가나다순</button>
-            <button class="sort-btn" data-sort="alpha">영문순</button>
           </div>
         </div>
         <div class="cards" id="cards"></div>
@@ -587,6 +588,7 @@
 
 <input type="file" id="dash-file" accept=".md,.markdown,.txt,text/markdown,text/plain" hidden>
 <input type="file" id="cover-file" accept="image/jpeg,image/png,image/webp" hidden>
+<div class="toast" id="toast"></div>
 
 <div class="pop" id="pop-info" style="right:16px">
   <h4>원고 정보</h4>
@@ -1871,7 +1873,8 @@ function assemble(md){
     await loadDocs();
   }
   /* ---------- 표지(cover) 업로드/교체/제거 ---------- */
-  const coverFileInput=$('#cover-file'); let coverTargetDoc=null;
+  const coverFileInput=$('#cover-file'); let coverTargetDoc=null; let toastTimer=0;
+  function toast(msg){ const t=$('#toast'); if(!t) return; t.textContent=msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),2200); }
   function coverUrl(path){ return sb.storage.from('covers').getPublicUrl(path).data.publicUrl; }
   function resizeImage(file,maxEdge){ return new Promise((res,rej)=>{
     const img=new Image(); const u=URL.createObjectURL(file);
@@ -1888,8 +1891,10 @@ function assemble(md){
   function onSetCover(d){ if(!coverFileInput) return; coverTargetDoc=d; coverFileInput.value=''; coverFileInput.click(); }
   if(coverFileInput) coverFileInput.addEventListener('change',async()=>{
     const file=coverFileInput.files&&coverFileInput.files[0]; const d=coverTargetDoc; if(!file||!d) return;
-    if(!/^image\/(jpeg|png|webp)$/.test(file.type)){ alert('jpg, png, webp 이미지만 올릴 수 있어요.'); return; }
-    if(file.size>15*1024*1024){ alert('이미지가 너무 큽니다 (최대 15MB).'); return; }
+    if(!/^image\/(jpeg|png|webp)$/.test(file.type)){ toast('jpg·png·webp 이미지만 올릴 수 있어요'); return; }
+    if(file.size>15*1024*1024){ toast('이미지가 너무 커요 (최대 15MB)'); return; }
+    const isReplace=!!d.cover_thumb_path;
+    toast('표지를 '+(isReplace?'바꾸는':'올리는')+' 중…');
     try{
       const [disp,thumb]=await Promise.all([resizeImage(file,1600),resizeImage(file,500)]);
       const base=CUR.user.id+'/'+d.id, dispPath=base+'/display.jpg', thumbPath=base+'/thumb.jpg';
@@ -1897,7 +1902,8 @@ function assemble(md){
       r=await sb.storage.from('covers').upload(thumbPath,thumb,{upsert:true,contentType:'image/jpeg'}); if(r.error) throw r.error;
       const {error}=await sb.from('documents').update({cover_path:dispPath,cover_thumb_path:thumbPath}).eq('id',d.id); if(error) throw error;
       await loadDocs();
-    }catch(e){ alert('표지 업로드 실패: '+(e.message||e)); }
+      toast(isReplace?'표지를 바꿨어요':'표지를 올렸어요');
+    }catch(e){ toast('표지 적용에 실패했어요'); }
   });
   async function onRemoveCover(d){
     if(!window.confirm('표지를 제거하고 자동 표지로 되돌릴까요?')) return;
