@@ -39,9 +39,10 @@
   .book::after{content:"";position:absolute;inset:0;border-radius:3px;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ink) 6%,transparent);pointer-events:none}
   .page-head,.page-foot{position:absolute;left:0;right:0;display:flex;align-items:center;color:var(--muted);font-family:var(--ui);pointer-events:none;padding:0 var(--padr) 0 var(--padl);z-index:2}
   .page-head{top:0;height:var(--padtop);font-size:11px;letter-spacing:.04em;justify-content:space-between}
-  .page-head .ph-r{max-width:55%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:right}
+  .page-head .ph-r{max-width:55%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:right;margin-right:-.04em}
   .page-foot{bottom:0;height:var(--padbot);justify-content:space-between;font-size:12px;letter-spacing:.08em}
   .page-foot .pf-c{flex:1;text-align:center}
+  .page-foot .pf-r{margin-right:-.08em}
   .gutter{position:absolute;top:6%;bottom:6%;left:50%;width:1px;background:color-mix(in srgb,var(--ink) 10%,transparent);z-index:1;display:none}
   .book.spread .gutter{display:block}
 
@@ -123,8 +124,8 @@
   .arrow.left{left:14px}.arrow.right{right:14px}.arrow:disabled{opacity:.12;cursor:default}
   .progress{position:absolute;left:0;right:0;bottom:0;height:34px;z-index:8;display:flex;align-items:center;gap:12px;padding:0 22px;pointer-events:none;background:linear-gradient(transparent,color-mix(in srgb,var(--stage) 72%,transparent))}
   .progress .track{flex:1;height:3px;border-radius:3px;background:color-mix(in srgb,var(--ink) 14%,transparent);overflow:hidden}
-  .progress .fill{height:100%;width:0;background:var(--accent);transition:width .34s}
-  .progress .label{font-size:11px;color:var(--muted);letter-spacing:.06em;min-width:72px;text-align:right}
+  .progress .fill{display:block;height:100%;width:0;background:var(--accent);transition:width .34s}
+  .progress .label{font-size:11px;color:var(--muted);letter-spacing:.06em;min-width:72px;text-align:right;margin-right:-.06em}
 
   /* popovers */
   .pop{position:absolute;top:54px;z-index:40;min-width:236px;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:14px;box-shadow:0 24px 60px -24px var(--shadow);padding:14px;display:none}
@@ -372,7 +373,10 @@
   body.pop-open .chrome-toggle{opacity:0;pointer-events:none}
   body.chrome-hidden .rail{display:none}
   body.chrome-hidden .chrome-toggle svg{transform:rotate(180deg)}
-  body.chrome-hidden .progress{opacity:0}
+  /* 몰입(접기) 시: 진행바를 숨기지 않고 바닥 얇은 선(2px)으로 — 위치감 유지 */
+  body.chrome-hidden .progress{background:none;height:auto;padding:0;pointer-events:none}
+  body.chrome-hidden .progress .label{display:none}
+  body.chrome-hidden .progress .track{height:2px;border-radius:0}
   /* 통합 보기 패널: 폭 고정 + 길면 데스크탑에서도 스크롤 */
   .pop-display{width:300px;max-height:calc(100vh - 72px);overflow:auto}
   .pop-note{font-size:11.5px;color:var(--muted);margin:7px 0 2px;line-height:1.5}
@@ -388,6 +392,15 @@
     .pop h4{font-size:12px;margin-top:6px}
     .row{margin:14px 0}
     .toc-list{max-height:64vh}
+  }
+  /* ===== 모바일 읽기: 박스 없는 풀화면 페이지넘김 ===== */
+  @media (max-width:640px){
+    body.doc-open .stage{padding:0;background:var(--sheet)}
+    body.doc-open .book{box-shadow:none;border-radius:0}
+    body.doc-open .book::after{display:none}
+    body.doc-open .page-head,body.doc-open .page-foot{display:none}
+    body.doc-open .chrome-toggle{display:none}
+    .pop-sec-layout{display:none}
   }
   @keyframes sheet{from{transform:translateY(100%)}to{transform:none}}
 </style>
@@ -585,6 +598,7 @@
   <div class="row"><span class="lbl">서체</span><span class="seg" id="seg-font"><button data-font="serif" aria-pressed="true">명조</button><button data-font="sans" aria-pressed="false">고딕</button></span></div>
   <div class="row"><span class="lbl">글자 크기</span><span class="stepper"><button id="fs-dn">−</button><span class="val" id="fs-val">18</span><button id="fs-up">＋</button></span></div>
   <div class="row"><span class="lbl">행간</span><span class="stepper"><button id="lh-dn">−</button><span class="val" id="lh-val">1.85</span><button id="lh-up">＋</button></span></div>
+  <div class="pop-sec-layout">
   <div class="divider"></div>
   <h4>판형</h4>
   <div class="row"><span class="lbl">크기</span><span class="seg" id="seg-trim"><button data-trim="mobile" aria-pressed="false">세로</button><button data-trim="pocket" aria-pressed="false">A6</button><button data-trim="trade" aria-pressed="true">신국판</button><button data-trim="wide" aria-pressed="false">와이드</button></span></div>
@@ -596,6 +610,7 @@
   <div class="row"><span class="lbl">아래</span><span class="stepper"><button data-mg="mBottom" data-d="-1">−</button><span class="val" id="mg-mBottom">5%</span><button data-mg="mBottom" data-d="1">＋</button></span></div>
   <div class="row"><span class="lbl">왼쪽</span><span class="stepper"><button data-mg="mLeft" data-d="-1">−</button><span class="val" id="mg-mLeft">10%</span><button data-mg="mLeft" data-d="1">＋</button></span></div>
   <div class="row"><span class="lbl">오른쪽</span><span class="stepper"><button data-mg="mRight" data-d="-1">−</button><span class="val" id="mg-mRight">10%</span><button data-mg="mRight" data-d="1">＋</button></span></div>
+  </div>
 </div>
 
 <div id="pop-scrim"></div>
@@ -1343,7 +1358,7 @@ function assemble(md){
         STATE.landmarks=r.landmarks; STATE.bookTitle=r.bookTitle; STATE.author=r.meta.author||'';
         STATE.footMap={}; r.footnotes.forEach(f=>STATE.footMap[f.n]=f.htmlR);
         $('#in-title').value=r.bookTitle||''; $('#in-author').value=STATE.author;
-        empty.classList.add('hidden'); book.hidden=false; progress.hidden=false;
+        empty.classList.add('hidden'); book.hidden=false; progress.hidden=false; document.body.classList.remove('chrome-hidden');
         document.body.classList.add('doc-open'); bgStop();
         railBtns.forEach(b=>b.disabled=false);
         STATE.page=0; buildFlow(); paginate(); render();
@@ -1380,16 +1395,23 @@ function assemble(md){
 
   /* ===== 크기 ===== */
   function sizeBook(){
-    const availH=stage.clientHeight-52, availW=stage.clientWidth-52, ratio=TRIMS[SETTINGS.trim];
-    let ph=Math.min(availH,860), pw=ph*ratio;
-    let spread=SETTINGS.view==='spread';
-    if(spread && stage.clientWidth<720) spread=false;
-    if(spread){ if(2*pw>availW){ pw=availW/2; ph=pw/ratio; if(ph>availH){ph=availH;pw=ph*ratio;} } }
-    else { if(pw>availW){ pw=availW; ph=pw/ratio; } }
+    const mob=window.matchMedia('(max-width:640px)').matches, pad=mob?0:52;   // 모바일: 풀화면(페이지=화면)
+    const availH=stage.clientHeight-pad, availW=stage.clientWidth-pad, ratio=TRIMS[SETTINGS.trim];
+    let ph,pw,spread;
+    if(mob){ spread=false; pw=availW; ph=availH; }
+    else {
+      ph=Math.min(availH,860); pw=ph*ratio;
+      spread=SETTINGS.view==='spread';
+      if(spread && stage.clientWidth<720) spread=false;
+      if(spread){ if(2*pw>availW){ pw=availW/2; ph=pw/ratio; if(ph>availH){ph=availH;pw=ph*ratio;} } }
+      else { if(pw>availW){ pw=availW; ph=pw/ratio; } }
+    }
     pw=Math.round(pw); ph=Math.round(ph);          // 정수화 — 칼럼 배치와 transform 정합(드리프트 방지)
     STATE.spread=spread;
-    const mL=Math.round(pw*SETTINGS.mLeft), mR=Math.round(pw*SETTINGS.mRight);
-    const mT=Math.max(24,Math.round(ph*SETTINGS.mTop)), mB=Math.max(26,Math.round(ph*SETTINGS.mBottom));
+    let mL,mR,mT,mB;
+    if(mob){ mL=mR=Math.max(18,Math.round(pw*0.055)); mT=Math.max(14,Math.round(ph*0.018)); mB=Math.max(20,Math.round(ph*0.03)); }
+    else { mL=Math.round(pw*SETTINGS.mLeft); mR=Math.round(pw*SETTINGS.mRight);
+           mT=Math.max(24,Math.round(ph*SETTINGS.mTop)); mB=Math.max(26,Math.round(ph*SETTINGS.mBottom)); }
     STATE.pInnerW=pw-mL-mR; STATE.gutter=mL+mR; STATE.step=STATE.pInnerW+STATE.gutter;  // = pw (정수)
     book.style.width=(spread?2*pw:pw)+'px'; book.style.height=ph+'px';
     book.classList.toggle('spread',spread);
@@ -1528,10 +1550,14 @@ function assemble(md){
 
   /* ===== 도구막대 접기·펴기 (몰입 읽기) ===== */
   const chromeToggle=$('#chrome-toggle');
-  if(chromeToggle) chromeToggle.onclick=()=>{ closePops();
+  function toggleChrome(){ closePops();
     const hidden=document.body.classList.toggle('chrome-hidden');
-    chromeToggle.title = hidden ? '도구막대 펴기' : '도구막대 접기';
-    requestAnimationFrame(()=>reflow(true)); };
+    if(chromeToggle) chromeToggle.title = hidden ? '도구막대 펴기' : '도구막대 접기';
+    requestAnimationFrame(()=>reflow(true)); }
+  if(chromeToggle) chromeToggle.onclick=toggleChrome;
+  /* 모바일 풀화면: 본문 가운데 탭 = 메뉴 토글 (각주·목차·링크는 그대로) */
+  book.addEventListener('click',e=>{ if(!isMobilePop())return;
+    if(e.target.closest('.fnref,.toc-row,a'))return; toggleChrome(); });
 
   /* ===== 컨트롤 ===== */
   function seg(el,cb){ el.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
