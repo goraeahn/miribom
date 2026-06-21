@@ -218,8 +218,8 @@
   /* ===== V1.1: 인증 + 대시보드 ===== */
   .user-chip{display:inline-flex;align-items:center;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12.5px;color:var(--muted);padding:0 4px}
   .dash{position:absolute;inset:0;z-index:28;overflow:auto;background:var(--stage);-webkit-overflow-scrolling:touch;touch-action:manipulation}
-  .dash-inner{max-width:900px;margin:0 auto;padding:clamp(16px,3vw,36px) clamp(12px,3vw,28px) 64px}
-  .dash-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 16px}
+  .dash-inner{max-width:1080px;margin:0 auto;padding:clamp(16px,2.4vw,30px) clamp(12px,2vw,16px) 48px;display:grid;grid-template-columns:minmax(0,1fr) 180px;gap:22px;align-items:start}
+  .dash-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 8px}
   .dash-greet{font-family:var(--ui);font-weight:500;font-size:clamp(14px,1.7vw,17px);color:var(--ink);margin:0;letter-spacing:.01em;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   #dash-manual{flex:0 0 auto;white-space:nowrap}
   .dash-count{font-size:13.5px;color:var(--muted);font-weight:500}
@@ -231,13 +231,14 @@
   .upload-toggle input:checked+.toggle-track::after{transform:translateX(14px)}
   body.dash-open .upload-toggle{display:inline-flex}
   body.dash-open #info-btn,body.dash-open #toc-btn,body.dash-open #display-btn{display:none!important}
-  .dash-upload{width:100%;height:clamp(60px,12vh,135px);margin:0 0 22px}
+  .dash-upload{width:100%;height:auto;margin:0 0 16px;flex-direction:row;justify-content:flex-start;align-items:center;gap:14px;padding:13px 16px;text-align:left;background-image:none}
+  .dz-text{display:flex;flex-direction:column;gap:2px}
   .dash-upload.dz-hot{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
   .dash-upload.disabled{opacity:.5;cursor:not-allowed}
   .dash-limit{margin:-8px 0 18px;font-size:13px;color:var(--accent);text-align:center}
-  .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(12px,1.6vw,20px)}
+  .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(10px,1.4vw,16px)}
   @media(max-width:900px){.cards{grid-template-columns:repeat(3,1fr)}}
-  @media(max-width:560px){.cards{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:640px){.cards{grid-template-columns:repeat(2,1fr)}}
   /* v2 카드 = 3:4 표지 썸네일 */
   .card{position:relative;container-type:inline-size;aspect-ratio:3/4;overflow:hidden;border-radius:14px;background:var(--cv-bg,#2C2B52);cursor:pointer;padding:0;display:block;width:100%;font-family:inherit;text-align:center;box-shadow:0 3px 12px -7px var(--shadow);transition:box-shadow .15s,transform .15s}
   .card:hover{box-shadow:0 16px 40px -22px var(--shadow);transform:translateY(-2px)}
@@ -274,6 +275,40 @@
   .sort-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
   .dash-foot{margin-top:36px;padding-bottom:8px;font-size:11.5px;color:var(--muted);text-align:center}
   .dash-foot a{color:var(--muted);text-decoration:underline;text-underline-offset:2px}
+  /* v2: 2단 — 본문 + 우측 사이드 메뉴 */
+  .dash-main{min-width:0}
+  .dash-side{display:flex;flex-direction:column;gap:16px;min-width:0}
+  .side-nav{display:flex;flex-direction:column;gap:1px}
+  .side-link{display:block;width:100%;text-align:left;background:none;border:none;font-family:var(--ui);font-size:14px;color:#666;padding:8px 10px;border-radius:8px;cursor:pointer;transition:background .14s,color .14s}
+  .side-link:hover{background:color-mix(in srgb,var(--ink) 5%,transparent);color:var(--ink)}
+  .side-link.active{color:var(--ink);font-weight:500;background:color-mix(in srgb,var(--ink) 6%,transparent)}
+  .side-box{margin-top:6px;border:1px solid var(--line);border-radius:10px;padding:12px 13px;font-size:11.5px;line-height:1.7;color:var(--muted)}
+  .side-box a{color:var(--muted);text-decoration:underline;text-underline-offset:2px}
+  .side-box-contact{margin-top:5px}
+  /* 콘텐츠 아티클 페이지 */
+  .doc-page{font-family:var(--ui);color:var(--ink);font-size:15px;line-height:1.78;max-width:680px;padding-bottom:20px}
+  .doc-page h1{font-family:var(--serif);font-size:clamp(23px,3.2vw,29px);font-weight:700;letter-spacing:.01em;margin:0 0 18px}
+  .doc-page h2{font-size:19px;font-weight:600;margin:32px 0 11px}
+  .doc-page h3{font-size:16px;font-weight:600;margin:22px 0 7px}
+  .doc-page p{margin:0 0 13px}
+  .doc-page ul,.doc-page ol{margin:0 0 13px;padding-left:21px}
+  .doc-page li{margin:4px 0}
+  .doc-page strong{font-weight:600}
+  .doc-page em{font-style:italic}
+  .doc-page hr{border:none;border-top:1px solid var(--line);margin:26px 0}
+  .doc-page blockquote{margin:0 0 13px;padding:4px 0 4px 15px;border-left:3px solid var(--line);color:var(--muted)}
+  .doc-page code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.9em;background:color-mix(in srgb,var(--ink) 7%,transparent);padding:.1em .35em;border-radius:4px}
+  .doc-page pre{background:color-mix(in srgb,var(--ink) 7%,transparent);padding:13px 15px;border-radius:10px;overflow:auto;margin:0 0 15px}
+  .doc-page pre code{background:none;padding:0;font-size:12.5px;line-height:1.62;white-space:pre-wrap;word-break:break-word}
+  .doc-page a{color:var(--accent);text-decoration:underline}
+  @media (max-width:640px){
+    .dash-inner{grid-template-columns:1fr;gap:0}
+    .dash-main{padding-bottom:72px}
+    .dash-side{position:fixed;left:50%;transform:translateX(-50%);bottom:14px;z-index:50;flex-direction:row;width:auto;max-width:calc(100vw - 18px);gap:0;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:5px;box-shadow:0 12px 30px -8px var(--shadow)}
+    .side-nav{flex-direction:row;gap:2px}
+    .side-link{font-size:12px;padding:7px 9px;white-space:nowrap;border-radius:9px}
+    .side-box{display:none}
+  }
   .pager{display:flex;justify-content:center;align-items:center;gap:6px;margin-top:30px;flex-wrap:wrap}
   .pager button{min-width:34px;height:34px;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;cursor:pointer;font-size:13px;padding:0 8px;font-family:inherit}
   .pager button[disabled]{opacity:.4;cursor:default}
@@ -491,28 +526,40 @@
 
     <div class="dash" id="dashboard" hidden>
       <div class="dash-inner">
-        <div class="dash-head">
-          <div class="dash-greet" id="dash-greet"></div>
-          <button class="btn solid lg" id="dash-manual">사용 설명서 보기</button>
-        </div>
-        <button class="dropzone dash-upload" id="dash-dropzone" type="button" aria-label="원고 올리기">
-          <span class="dz-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="m7 8 5-5 5 5"/><path d="M4 14v5a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-5"/></svg></span>
-          <div class="dz-title">.md 파일을 여기로 끌어다 놓으세요</div>
-          <div class="dz-sub">또는 눌러서 올리기 — 내 계정에 저장됩니다</div>
-        </button>
-        <div class="dash-limit" id="dash-limit" hidden>최대 20개까지 업로드할 수 있습니다.</div>
-        <div class="cards-header" id="cards-header" hidden>
-          <div class="dash-count" id="dash-count"></div>
-          <div class="sort-btns">
-            <button class="sort-btn active" data-sort="newest">최신순</button>
-            <button class="sort-btn" data-sort="oldest">오래된순</button>
-            <button class="sort-btn" data-sort="korean">가나다순</button>
+        <div class="dash-main">
+          <div id="lib-view">
+            <div class="dash-head">
+              <div class="dash-greet" id="dash-greet"></div>
+              <button class="btn solid" id="dash-manual">사용 설명서 보기</button>
+            </div>
+            <button class="dropzone dash-upload" id="dash-dropzone" type="button" aria-label="원고 올리기">
+              <span class="dz-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="m7 8 5-5 5 5"/><path d="M4 14v5a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-5"/></svg></span>
+              <div class="dz-text"><div class="dz-title">.md 파일을 여기로 끌어다 놓으세요</div><div class="dz-sub">또는 눌러서 올리기 — 내 계정에 저장됩니다</div></div>
+            </button>
+            <div class="dash-limit" id="dash-limit" hidden>최대 20개까지 업로드할 수 있습니다.</div>
+            <div class="cards-header" id="cards-header" hidden>
+              <div class="dash-count" id="dash-count"></div>
+              <div class="sort-btns">
+                <button class="sort-btn active" data-sort="newest">최신순</button>
+                <button class="sort-btn" data-sort="oldest">오래된순</button>
+                <button class="sort-btn" data-sort="korean">가나다순</button>
+              </div>
+            </div>
+            <div class="cards" id="cards"></div>
+            <div class="dash-empty" id="dash-empty" hidden>아직 업로드 된 파일이 없어요.</div>
+            <nav class="pager" id="pager"></nav>
           </div>
+          <article class="doc-page" id="page-view" hidden></article>
         </div>
-        <div class="cards" id="cards"></div>
-        <div class="dash-empty" id="dash-empty" hidden>아직 업로드 된 파일이 없어요.</div>
-        <nav class="pager" id="pager"></nav>
-        <footer class="dash-foot">주식회사 코드넛 · <a href="https://codnut.com" target="_blank" rel="noopener noreferrer">codnut.com</a> · 미리봄 1.0</footer>
+        <aside class="dash-side">
+          <nav class="side-nav">
+            <button class="side-link active" type="button" data-view="lib">나의 서재</button>
+            <button class="side-link" type="button" data-page="public">공용 서재</button>
+            <button class="side-link" type="button" data-page="guide">이용 안내</button>
+            <button class="side-link" type="button" data-page="faq">자주 묻는 질문</button>
+          </nav>
+          <div class="side-box">주식회사 코드넛 · <a href="https://codnut.com" target="_blank" rel="noopener noreferrer">codnut.com</a> · 미리봄 1.0<div class="side-box-contact">문의처 gorae@codnut.com</div></div>
+        </aside>
       </div>
     </div>
   </div>
@@ -589,6 +636,193 @@
 <input type="file" id="dash-file" accept=".md,.markdown,.txt,text/markdown,text/plain" hidden>
 <input type="file" id="cover-file" accept="image/jpeg,image/png,image/webp" hidden>
 <div class="toast" id="toast"></div>
+
+<script type="text/plain" id="page-public"># 공용 서재
+
+여러 작가의 원고를 한자리에서 만나는 공간입니다.
+
+## 준비 중입니다
+
+공용 서재는 지금 준비하고 있습니다. 곧 이곳에서, 작가가 직접 공개를 선택한 원고들을 함께 펼쳐 볼 수 있게 됩니다.
+
+미리봄의 원고는 **비공개가 기본**입니다. 공용 서재에는 작가가 "이 글은 모두에게 보여 주겠다"고 직접 정한 원고만 올라옵니다. 내가 올린 글이 나도 모르게 공개되는 일은 없습니다.
+
+문을 열면 이런 일을 할 수 있게 할 생각입니다.
+
+- 내 원고를 공용 서재에 올려, 누구나 가입 없이 읽게 하기
+- 다른 작가가 공개한 글을 책처럼 넘겨 읽기
+- 마음에 드는 원고를 모아 두기
+
+## 그때까지는
+
+지금도 원고를 **링크로 조용히 나누는 것**은 됩니다. 편집자나 지인에게만 보여 주고 싶다면, 각 원고의 **공유하기**로 링크를 만들어 보내세요. 자세한 방법은 「이용 안내」에 있습니다.
+
+공용 서재가 열리면 가장 먼저 알려 드리겠습니다.</script>
+
+<script type="text/plain" id="page-guide"># 이용 안내
+
+미리봄은 마크다운(`.md`) 원고를 책처럼 보여 줍니다. 워드·PDF·한글 파일로 된 글이 있다면, 먼저 마크다운으로 바꾸어 올리면 됩니다. 그 방법과, 완성한 원고를 다른 사람에게 공유하는 방법을 안내합니다.
+
+---
+
+## 1. 다른 문서를 마크다운으로 바꾸기
+
+가장 쉬운 길은 **AI(예: Claude)에게 맡기는 것**입니다. AI는 글의 구조(제목·문단·장면 전환)를 알아보고, 미리봄이 쓰는 형식 그대로 바꿔 줍니다. 무료로도 할 수 있습니다.
+
+공통 순서는 이렇습니다.
+
+1. 파일을 올릴 수 있는 AI 채팅을 엽니다.
+2. 문서를 올립니다.
+3. 아래 **변환 프롬프트**를 함께 보냅니다.
+4. 받은 마크다운을 복사해 `책제목.md`로 저장합니다.
+5. 그 파일을 미리봄에 끌어다 놓습니다.
+
+### 변환 프롬프트 (복사해서 쓰세요)
+
+```
+첨부한 문서를 '미리봄' 마크다운 형식으로 바꿔 주세요. 규칙은 다음과 같습니다.
+
+1. 원문을 그대로 옮기세요. 요약·수정·생략하지 말고, 맞춤법도 임의로 고치지 마세요.
+2. 맨 위에 책 정보를 YAML로 적으세요(아는 만큼만):
+   ---
+   title: 제목
+   author: 지은이
+   date: 발행일
+   lang: ko
+   ---
+3. 가장 큰 묶음(부)은 #, 장은 ##, 작은 소제목은 ### 로 표시하세요.
+4. 문단은 빈 줄로 나누고, 한 문단 안에서는 줄을 이어 쓰세요.
+5. 강조는 *기울임* 과 **굵게**, 인용문은 줄 앞에 > 를 붙이세요.
+6. 장면이 바뀌는 자리는 빈 줄에 --- 또는 · · · 로 표시하세요.
+7. 각주는 본문에 [^1], 아래에 [^1]: 내용 형태로 적으세요.
+8. 표지·머리말·후기처럼 본문이 아닌 특별한 쪽은 ::: 이름표 … ::: 로 감싸세요.
+   이름표 — 표지 속표지 판권 헌사 머리말 서문 들어가는글 목차 / 후기 부록 색인 간기
+   표지는 제목과 지은이만 글자로 넣고, 그림 파일은 넣지 마세요.
+9. 표는 | 칸 | 형식으로 만드세요.
+10. 결과는 마크다운 하나로만 주세요. 다른 설명은 붙이지 마세요.
+```
+
+### 워드(DOCX)
+
+가장 깨끗하게 변환됩니다. 워드 문서는 제목·문단 같은 구조가 이미 잡혀 있어서, 위 방법으로 거의 그대로 옮겨집니다. AI 대신 Pandoc 같은 변환 도구나 온라인 변환기를 써도 됩니다.
+
+### PDF
+
+PDF는 글이 아니라 화면 배치로 저장되어 있어 조금 더 까다롭습니다. 위의 AI 방법을 권합니다. 다만 두 가지를 유의하세요.
+
+- 분량이 많으면 한 번에 안 될 수 있습니다. "1장부터 3장까지"처럼 나눠 받아 이어 붙이면 됩니다.
+- 종이를 찍거나 스캔한 PDF는 글자 인식이 틀릴 수 있으니, 변환 뒤 더 꼼꼼히 확인하세요.
+
+### 한글(HWP)
+
+AI나 변환기가 한글 파일(`.hwp`)을 바로 읽지 못하는 경우가 많습니다. 한 단계를 거치면 됩니다.
+
+1. 한글(한컴오피스)에서 파일을 열고 **다른 이름으로 저장하기**를 누릅니다.
+2. 파일 형식을 **Microsoft Word 문서(.docx)** 또는 **PDF**로 골라 내보냅니다.
+3. 그 파일을 위의 워드/PDF 방법으로 변환합니다.
+
+한글 프로그램이 없다면 온라인 변환 서비스로 `.docx`나 PDF로 바꾼 뒤 진행할 수도 있습니다. 다만 아직 공개하지 않은 원고라면, 믿을 수 있는 곳인지 먼저 확인하세요.
+
+### 변환한 뒤에 꼭 확인하세요
+
+- **원문과 대조하기.** AI는 구조를 잡는 데는 뛰어나지만, 가끔 문장을 미묘하게 바꾸거나 한 줄을 빠뜨립니다. 원본과 한 번 맞춰 보세요. 원고에서는 글자 하나가 중요합니다.
+- **미공개 원고는 믿을 수 있는 도구에서만** 변환하세요.
+
+---
+
+## 2. 원고 공유하기
+
+다 만든 원고는 링크 하나로 다른 사람에게 보여 줄 수 있습니다.
+
+1. 서재에서 원고 위에 마우스를 올리고 **공유하기**를 누릅니다.
+2. 만들어진 링크를 편집자나 지인에게 보냅니다.
+3. 받는 사람은 **가입 없이** 링크를 열어 바로 읽습니다.
+
+알아 두면 좋은 점입니다.
+
+- 공유 링크는 **추측하기 어려운 주소**라, 링크를 받지 않은 사람은 열 수 없습니다. 받은 사람은 **읽기만** 할 수 있고, 원고를 고치거나 내려받지는 못합니다.
+- 공유는 **보낸 그 순간의 원고**를 담습니다. 이후에 원고를 고쳐도, 이미 보낸 링크에는 보낼 때의 내용이 그대로 남습니다. 편집자가 보던 글이 갑자기 바뀌어 헷갈릴 일이 없습니다.
+- 공유를 멈추고 싶을 때는 링크를 거두면 됩니다.
+
+원고가 아직 세상에 나오지 않은 글이라면, 이렇게 링크로만 조용히 보여 주는 방식이 가장 안전합니다.
+
+---
+
+## 3. 표지 넣기
+
+표지 그림을 넣고 싶다면, 마크다운에 그림 주소를 적는 대신 **미리봄에서 표지 이미지를 직접 올리세요.** 원고 위 메뉴의 **썸네일 넣기**에서 그림을 올리면 됩니다. 이렇게 해야 공유했을 때도 표지가 제대로 보입니다.
+
+그림이 없어도 괜찮습니다. 제목만 있으면 미리봄이 어울리는 표지를 자동으로 만들어 줍니다.
+
+---
+
+궁금한 점이 더 있다면 「자주 묻는 질문」을 보시거나, **gorae@codnut.com**으로 문의해 주세요.</script>
+
+<script type="text/plain" id="page-faq"># 자주 묻는 질문
+
+미리봄을 쓰면서 자주 나오는 질문을 모았습니다. 찾는 답이 없다면 **gorae@codnut.com**으로 물어봐 주세요.
+
+---
+
+### 미리봄은 어떤 프로그램인가요?
+
+미리봄은 글을 쓰는 도구가 아니라, 이미 써 둔 글이 **책에서는 어떻게 보일지 미리 보여 주는** 도구입니다. 마크다운 원고를 올리면 종이책이나 전자책 리더에서 펼친 듯한 모습으로 바꿔 보여 주고, 그대로 다른 사람에게 공유할 수 있습니다.
+
+### 어떤 파일을 올릴 수 있나요?
+
+마크다운 파일(`.md`)을 올립니다. 워드(DOCX)·PDF·한글(HWP)로 된 글은 먼저 마크다운으로 바꾸면 됩니다. 바꾸는 방법은 「이용 안내」에 자세히 적어 두었습니다.
+
+### 워드나 한글 파일은 그냥 못 올리나요?
+
+지금은 마크다운만 직접 읽습니다. 워드·PDF·한글 원고는 「이용 안내」의 방법으로 마크다운으로 바꾼 뒤 올려 주세요. AI를 쓰면 무료로 어렵지 않게 바꿀 수 있습니다.
+
+### 마크다운을 꼭 배워야 하나요?
+
+거의 배울 게 없습니다. 빈 줄로 문단을 나누고, 제목 앞에 `#`을 붙이는 정도면 산문은 대부분 됩니다. 자세한 규칙은 **사용 설명서**를 한 번 넘겨 보시면 금방 익힐 수 있습니다.
+
+### 내 원고가 다른 사람에게 보이나요?
+
+아니요. 올린 원고는 **비공개가 기본**입니다. 내가 직접 공유 링크를 만들어 보내거나, 공용 서재에 공개하기 전까지는 나만 볼 수 있습니다.
+
+### 공유 링크를 받은 사람도 가입해야 하나요?
+
+아니요. 링크를 받은 사람은 **가입 없이** 바로 읽을 수 있습니다. 읽기만 가능하고, 원고를 고치거나 내려받을 수는 없습니다.
+
+### 공유한 뒤에 원고를 고치면 어떻게 되나요?
+
+이미 보낸 링크에는 **보낼 때의 내용이 그대로** 남습니다. 원고를 계속 고쳐도, 편집자가 보던 글이 갑자기 바뀌지 않습니다.
+
+### 원고는 몇 개까지 올릴 수 있나요?
+
+한 계정에 **20개**까지 올릴 수 있습니다. 더 필요하시면 문의해 주세요.
+
+### 표지는 어떻게 넣나요?
+
+원고 위 메뉴의 **썸네일 넣기**에서 그림을 올리면 됩니다. 그림이 없어도 제목만 있으면 미리봄이 어울리는 표지를 자동으로 만들어 줍니다.
+
+### 글자가 깨지거나 표가 잘려 보여요.
+
+화면이 좁은 판형(모바일·문고본)에서는 칸이 많은 표가 잘릴 수 있습니다. 표가 많은 원고는 넓은 판형(단행본·태블릿)에서 보길 권합니다. 글꼴·크기·여백·판형은 **보기** 설정에서 바꿀 수 있습니다.
+
+### 휴대폰에서도 되나요?
+
+네, 휴대폰에서도 읽고 넘겨 볼 수 있습니다.
+
+### 원고를 지우면 되돌릴 수 있나요?
+
+삭제한 원고는 되돌리기 어렵습니다. 지우기 전에 한 번 더 확인해 주세요.
+
+### 비용이 드나요?
+
+지금 미리봄은 미리보기 단계로, 자유롭게 사용해 보실 수 있습니다. 정식 이용 정책은 준비되는 대로 안내하겠습니다.
+
+### 문의는 어디로 하나요?
+
+**gorae@codnut.com**으로 보내 주시면 됩니다. 의견이나 불편한 점도 환영합니다.
+
+---
+
+*이 문서는 계속 업데이트됩니다.*</script>
 
 <div class="pop" id="pop-info" style="right:16px">
   <h4>원고 정보</h4>
@@ -1674,7 +1908,7 @@ function assemble(md){
   }
 
   const sb=sbLib.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
-  const LIMIT=20, PER_PAGE=12;
+  const LIMIT=20, PER_PAGE=8;
   // v2 자동표지 8색 (깊은 탈색 톤) — hash(id)%8로 결정론적
   const COVER_PAL=['#2C2B52','#1F4540','#4A2230','#26402B','#2E3A4F','#3A2A4A','#5A3320','#353A2E'];
   const COVER_INK='#ECE4D2';
@@ -1855,6 +2089,24 @@ function assemble(md){
       renderCards();
     };
   });
+  /* ---------- 사이드 메뉴 / 콘텐츠 페이지 ---------- */
+  function escHtml(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function mdInline(s){ s=escHtml(s); s=s.replace(/`([^`]+)`/g,(m,c)=>'<code>'+c+'</code>'); s=s.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>'); s=s.replace(/(^|[^*])\*([^*\n]+)\*/g,'$1<em>$2</em>'); s=s.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g,'<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>'); return s; }
+  function mdToHtml(md){ const L=(md||'').replace(/\r/g,'').split('\n'); let h='',i=0,inL=false,lt=''; const cl=()=>{ if(inL){ h+='</'+lt+'>'; inL=false; } };
+    while(i<L.length){ const ln=L[i];
+      if(/^```/.test(ln)){ cl(); i++; let c=''; while(i<L.length&&!/^```/.test(L[i])){ c+=L[i]+'\n'; i++; } i++; h+='<pre><code>'+escHtml(c.replace(/\n$/,''))+'</code></pre>'; continue; }
+      if(/^(---+|· · ·|\.\.\.)\s*$/.test(ln.trim())){ cl(); h+='<hr>'; i++; continue; }
+      const hd=ln.match(/^(#{1,4})\s+(.*)$/); if(hd){ cl(); const lv=hd[1].length; h+='<h'+lv+'>'+mdInline(hd[2])+'</h'+lv+'>'; i++; continue; }
+      if(/^>\s?/.test(ln)){ cl(); let q=''; while(i<L.length&&/^>\s?/.test(L[i])){ q+=L[i].replace(/^>\s?/,'')+' '; i++; } h+='<blockquote>'+mdInline(q.trim())+'</blockquote>'; continue; }
+      if(/^[-*]\s+/.test(ln)){ if(!inL||lt!=='ul'){ cl(); h+='<ul>'; inL=true; lt='ul'; } h+='<li>'+mdInline(ln.replace(/^[-*]\s+/,''))+'</li>'; i++; continue; }
+      if(/^\d+\.\s+/.test(ln)){ if(!inL||lt!=='ol'){ cl(); h+='<ol>'; inL=true; lt='ol'; } h+='<li>'+mdInline(ln.replace(/^\d+\.\s+/,''))+'</li>'; i++; continue; }
+      if(ln.trim()===''){ cl(); i++; continue; }
+      cl(); let p=ln; i++; while(i<L.length&&L[i].trim()!==''&&!/^(#{1,4}\s|[-*]\s|\d+\.\s|>\s?|```)/.test(L[i])){ p+=' '+L[i]; i++; } h+='<p>'+mdInline(p)+'</p>';
+    } cl(); return h; }
+  function setActiveNav(k){ document.querySelectorAll('.side-link').forEach(b=>b.classList.toggle('active',(k==='lib'&&b.dataset.view==='lib')||b.dataset.page===k)); }
+  function showLib(){ const lv=document.getElementById('lib-view'),pv=document.getElementById('page-view'); if(lv)lv.hidden=false; if(pv)pv.hidden=true; setActiveNav('lib'); }
+  function showPage(key){ const sc=document.getElementById('page-'+key),pv=document.getElementById('page-view'),lv=document.getElementById('lib-view'); if(!sc||!pv) return; pv.innerHTML=mdToHtml(sc.textContent); pv.hidden=false; if(lv)lv.hidden=true; setActiveNav(key); const dd=document.getElementById('dashboard'); if(dd) dd.scrollTop=0; }
+  document.querySelectorAll('.side-link').forEach(b=>{ b.onclick=()=>{ if(b.dataset.view==='lib') showLib(); else showPage(b.dataset.page); }; });
   function renderPager(pages){ pagerEl.innerHTML=''; if(pages<=1) return;
     const mk=(label,p,opt)=>{ const b=document.createElement('button'); b.textContent=label;
       if(opt&&opt.disabled) b.disabled=true; if(opt&&opt.active) b.className='active';
