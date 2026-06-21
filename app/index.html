@@ -107,15 +107,16 @@
   .book-bleed{position:absolute;inset:0;z-index:4;overflow:hidden;display:none}
   .book.cover-page .book-bleed{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
   .book-bleed .bl-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}
-  .book-bleed.auto{padding:11% 9%;color:#ECE4D2}
+  .book-bleed.auto{color:#ECE4D2}
   /* 이미지 위에 ::: 표지 텍스트가 얹힐 때만 가독용 그라데이션 */
   .book-bleed.img.has-text::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(to bottom,rgba(0,0,0,.16),rgba(0,0,0,.52))}
-  .book-bleed .bl-center{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:clamp(8px,2.2vw,18px);padding:8% 9%}
+  .book-bleed .bl-center{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:clamp(9px,2.1vw,17px);padding:7% 9%}
   .book-bleed.img .bl-center{color:#fff;text-shadow:0 2px 14px rgba(0,0,0,.6)}
+  /* 카드 자동표지처럼 제목 위 짧은 선 */
+  .book-bleed .bl-rule{width:clamp(24px,4.2vw,42px);height:2px;background:currentColor;opacity:.5}
   .book-bleed .bl-title{font-family:var(--serif);font-weight:500;font-size:clamp(24px,5vw,46px);line-height:1.25;letter-spacing:.01em;max-width:18ch;word-break:keep-all}
-  /* 규칙3: 저자 등 나머지는 하단에 옅은 다른 색 */
-  .book-bleed .bl-foot{position:absolute;left:0;right:0;bottom:clamp(30px,7.5vw,68px);z-index:2;display:flex;flex-direction:column;gap:.3em;padding:0 9%}
-  .book-bleed .bl-sub{font-family:var(--ui);font-size:clamp(13px,1.9vw,18px);opacity:.6;letter-spacing:.05em}
+  /* 부제·소개: 제목 바로 밑 · 명조 · 볼드 아님 · 옅은 색 · 아담한 크기 */
+  .book-bleed .bl-sub{font-family:var(--serif);font-weight:400;font-size:clamp(15px,2.4vw,21px);line-height:1.4;letter-spacing:.01em;opacity:.62;max-width:24ch;word-break:keep-all}
   .book-bleed.img .bl-sub{opacity:.92}
   .flow .sp-footnotes .fnlist{font-size:.9em;color:var(--muted);margin-left:1.2em}
   .flow .sp-footnotes li{margin:.3em 0}
@@ -1707,14 +1708,15 @@ function assemble(md){
         }
       }
     } else {
-      // 규칙3: 이미지 없음 = 카드와 같은 색(제목 해시) 배경 + 제목(진하게·가운데) + 나머지(하단·옅게)
+      // 규칙3: 이미지 없음 = 카드와 같은 색(제목 해시) 배경 + 선 + 제목 + 부제(제목 바로 밑·명조·옅게). 카드와 한 덩어리로 가운데.
       bl.classList.add('auto'); bl.style.background=deepColor(STATE.colorKey||STATE.bookTitle);
       const c=coverText(explicit), title=c.title||STATE.bookTitle;
-      if(title){ const t=document.createElement('div'); t.className='bl-title'; t.textContent=title; bl.appendChild(t); }
-      if(c.rest.length){
-        const foot=document.createElement('div'); foot.className='bl-foot';
-        c.rest.forEach(s=>{ const e=document.createElement('div'); e.className='bl-sub'; e.textContent=s; foot.appendChild(e); });
-        bl.appendChild(foot);
+      if(title||c.rest.length){
+        const box=document.createElement('div'); box.className='bl-center';
+        const rule=document.createElement('div'); rule.className='bl-rule'; box.appendChild(rule);
+        if(title){ const t=document.createElement('div'); t.className='bl-title'; t.textContent=title; box.appendChild(t); }
+        c.rest.forEach(s=>{ const e=document.createElement('div'); e.className='bl-sub'; e.textContent=s; box.appendChild(e); });
+        bl.appendChild(box);
       }
     }
   }
