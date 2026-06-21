@@ -58,6 +58,7 @@
   .flow h3{font-size:1.12em}
   .flow h2.unnum,.flow h3.unnum{margin-top:.2em}
   .flow h1.doc-h,.flow h2.doc-h{break-before:column}
+  .flow .body-start{break-before:column}
   .flow h1.doc-h{margin-top:0;padding-top:var(--part-pad,30%)}
   .flow h2.doc-h{margin-top:0;margin-bottom:2.7em}
   .flow.no-breaks h1.doc-h,.flow.no-breaks h2.doc-h{break-before:auto}
@@ -1629,13 +1630,44 @@ function assemble(md){
     }
     return html;
   }
+  function markBodyStart(){
+    // 앞부속(front) 다음, 제목이 없어도 본문 첫 블록은 항상 새 쪽에서 시작
+    flow.querySelectorAll('.body-start').forEach(el=>el.classList.remove('body-start'));
+    let sawFront=false;
+    for(const el of flow.children){
+      if(el.getAttribute('data-matter')==='front'){ sawFront=true; continue; }
+      if(sawFront) el.classList.add('body-start');
+      break;
+    }
+  }
   function buildFlow(){
     flow.innerHTML=composeFlow();
+    markBodyStart();
     flow.classList.toggle('no-breaks',!SETTINGS.chapterBreaks);
     const bf=SETTINGS.font==='serif'?'var(--serif)':'var(--sans)';
     flow.style.fontFamily=bf; flow.style.setProperty('--book-font',bf);
     flow.style.setProperty('--fs',SETTINGS.fs+'px'); flow.style.setProperty('--lh',SETTINGS.lh);
   }
+  /* ===== 회귀 셀프테스트 (?selftest=1) ===== */
+  async function runSelfTests(){
+    const out=[], A=(n,c)=>out.push({n,pass:!!c});
+    const load=md=>new Promise(res=>{ loadManuscript(md); let t=0; const w=()=>{ if(!book.hidden && STATE.pageCount>0 && flow.children.length) res(true); else if(++t>150) res(false); else setTimeout(w,40); }; setTimeout(w,60); });
+    const fx='---\ntitle: 회귀 — 머리말 다음 평범한 본문\nauthor: 테스트\n---\n\n::: 머리말\n책을 펴기 전, 짧게 적는 머리말입니다. 본문이 아니라 앞부속이라 자기 쪽을 가집니다.\n:::\n\n토요일 저녁이었다. 제목 없이 평범한 문단으로 본문이 시작한다. 이 문단은 머리말과 다른 쪽에서 시작해야 한다.\n\n둘째 문단. 이어지는 본문 내용을 조금 더 적어 둔다.';
+    const ok=await load(fx);
+    A('픽스처 로드·조판', ok);
+    const front=flow.querySelector('[data-matter="front"]'), bs=flow.querySelector('.body-start');
+    A('본문 첫 블록에 body-start 부여', !!bs);
+    A('body-start가 제목 아닌 문단(P)', bs && bs.tagName==='P');
+    A('body-start break-before=column', bs && getComputedStyle(bs).breakBefore==='column');
+    A('머리말과 본문 첫 문단이 다른 쪽(컬럼)', front && bs && Math.abs(front.offsetLeft-bs.offsetLeft)>1);
+    const pass=out.every(r=>r.pass);
+    console.log('%c[미리봄 회귀 셀프테스트] '+(pass?'PASS':'FAIL'),'font-weight:bold;font-size:13px');
+    out.forEach(r=>console.log((r.pass?'  ✅ ':'  ❌ ')+r.n));
+    document.title=(pass?'[PASS] ':'[FAIL] ')+'미리봄 셀프테스트';
+    return {pass, out};
+  }
+  window.__selftest=runSelfTests;
+  if(/[?&]selftest/.test(location.search)) window.addEventListener('load',()=>setTimeout(runSelfTests,500));
 
   /* ===== 크기 ===== */
   function sizeBook(){
