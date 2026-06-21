@@ -106,11 +106,17 @@
   /* D: 표지 전면(full-bleed) 오버레이 — 책 시트를 가득 채움(둥근 모서리·그림자는 .book이 유지) */
   .book-bleed{position:absolute;inset:0;z-index:4;overflow:hidden;display:none}
   .book.cover-page .book-bleed{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
-  .book-bleed .bl-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .book-bleed .bl-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}
   .book-bleed.auto{padding:11% 9%;color:#ECE4D2}
-  .book-bleed .bl-rule{width:38px;height:2px;background:currentColor;opacity:.5;margin-bottom:clamp(14px,3.2vw,28px)}
+  /* 이미지 위에 ::: 표지 텍스트가 얹힐 때만 가독용 그라데이션 */
+  .book-bleed.img.has-text::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(to bottom,rgba(0,0,0,.16),rgba(0,0,0,.52))}
+  .book-bleed .bl-center{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:clamp(8px,2.2vw,18px);padding:8% 9%}
+  .book-bleed.img .bl-center{color:#fff;text-shadow:0 2px 14px rgba(0,0,0,.6)}
   .book-bleed .bl-title{font-family:var(--serif);font-weight:500;font-size:clamp(24px,5vw,46px);line-height:1.25;letter-spacing:.01em;max-width:18ch;word-break:keep-all}
-  .book-bleed .bl-author{margin-top:clamp(14px,3.2vw,28px);font-family:var(--ui);font-size:clamp(13px,1.9vw,18px);opacity:.7}
+  /* 규칙3: 저자 등 나머지는 하단에 옅은 다른 색 */
+  .book-bleed .bl-foot{position:absolute;left:0;right:0;bottom:clamp(30px,7.5vw,68px);z-index:2;display:flex;flex-direction:column;gap:.3em;padding:0 9%}
+  .book-bleed .bl-sub{font-family:var(--ui);font-size:clamp(13px,1.9vw,18px);opacity:.6;letter-spacing:.05em}
+  .book-bleed.img .bl-sub{opacity:.92}
   .flow .sp-footnotes .fnlist{font-size:.9em;color:var(--muted);margin-left:1.2em}
   .flow .sp-footnotes li{margin:.3em 0}
   /* 자동 목차 */
@@ -1602,7 +1608,7 @@ function assemble(md){
   const railBtns=['#info-btn','#toc-btn','#display-btn'].map($);
 
   /* ===== 로드 (SEAM: 향후 토큰 fetch로 교체) ===== */
-  function loadManuscript(md, coverUrl){
+  function loadManuscript(md, coverUrl, colorKey){
     const loading=$('#loading'), lmsg=loading.querySelector('.lmsg');
     lmsg.textContent = md.length>120000 ? '큰 원고예요. 페이지를 나누는 중…' : '원고를 펼치는 중…';
     loading.hidden=false;
@@ -1616,7 +1622,7 @@ function assemble(md){
         empty.classList.add('hidden'); book.hidden=false; progress.hidden=false; document.body.classList.remove('chrome-hidden');
         document.body.classList.add('doc-open'); bgStop();
         railBtns.forEach(b=>b.disabled=false);
-        STATE.coverUrl=coverUrl||''; STATE.page=0; buildFlow(); paginate(); render();
+        STATE.coverUrl=coverUrl||''; STATE.colorKey=colorKey||''; STATE.page=0; buildFlow(); paginate(); render();
       }catch(e){ console.warn('load',e); }
       finally{ loading.hidden=true; }
     }));
@@ -1652,6 +1658,7 @@ function assemble(md){
   }
   function buildFlow(){
     flow.innerHTML=composeFlow();
+    ensureCoverPage();
     markBodyStart();
     flow.classList.toggle('no-breaks',!SETTINGS.chapterBreaks);
     const bf=SETTINGS.font==='serif'?'var(--serif)':'var(--sans)';
@@ -1659,23 +1666,59 @@ function assemble(md){
     flow.style.setProperty('--fs',SETTINGS.fs+'px'); flow.style.setProperty('--lh',SETTINGS.lh);
     buildBleed();
   }
-  /* ===== D: 표지 전면(full-bleed) ===== */
+  /* ===== D: 표지 전면(full-bleed) — 규칙: 항상 표지 1쪽 / 이미지=배경(+:::표지 있으면 중앙텍스트) / 없으면 카드색+제목+하단저자 ===== */
   const DEEP_PAL=['#2C2B52','#1F4540','#4A2230','#26402B','#2E3A4F','#3A2A4A','#5A3320','#353A2E'];
   function deepColor(s){ let h=0; for(let i=0;i<(s||'').length;i++) h+=s.charCodeAt(i); return DEEP_PAL[h%DEEP_PAL.length]; }
+  // 규칙1: 표지 쪽이 없으면(제목 없는 원고 등) 최소 표지 쪽을 맨 앞에 끼워 항상 표지로 시작
+  function ensureCoverPage(){
+    if(!SETTINGS.showFront) return;
+    const f=flow.children[0];
+    if(f && (f.classList.contains('sp-cover')||f.classList.contains('sp-titlepage'))) return;
+    const sec=document.createElement('section');
+    sec.className='special sp-cover'; sec.setAttribute('data-matter','front');
+    sec.setAttribute('data-lm-auto','1'); sec.setAttribute('data-cover-blank','1');
+    flow.insertBefore(sec, flow.firstChild);
+  }
+  // 표지에 얹을 글자 — 작가가 직접 쓴 ::: 표지 우선, 없으면 YAML/첫제목·저자
+  function coverText(explicit){
+    if(explicit){
+      const h=explicit.querySelector('h1,h2,h3,.tp-title'), rest=[];
+      explicit.querySelectorAll('p').forEach(p=>{ if(p.querySelector('img,.md-img-ph')) return; const t=(p.textContent||'').trim(); if(t) rest.push(t); });
+      return { title:(h?h.textContent.trim():'')||STATE.bookTitle, rest };
+    }
+    return { title:STATE.bookTitle, rest: STATE.author?[STATE.author]:[] };
+  }
   function buildBleed(){
     const bl=$('#book-bleed'); if(!bl) return;
     const first=flow.children[0];
     STATE.hasCoverPage = !!(first && (first.classList.contains('sp-cover')||first.classList.contains('sp-titlepage')));
     bl.className='book-bleed'; bl.style.background=''; bl.innerHTML='';
     if(!STATE.hasCoverPage) return;
+    const explicit=flow.querySelector('.sp-cover:not([data-lm-auto])');  // 작가가 직접 쓴 ::: 표지
     if(STATE.coverUrl){
+      // 규칙2: 업로드 이미지 = 배경 꽉차게. ::: 표지가 있을 때만 중앙 텍스트.
       bl.classList.add('img');
       const img=document.createElement('img'); img.className='bl-img'; img.alt=''; img.src=STATE.coverUrl; bl.appendChild(img);
+      if(explicit){
+        const c=coverText(explicit);
+        if(c.title||c.rest.length){
+          bl.classList.add('has-text');
+          const box=document.createElement('div'); box.className='bl-center';
+          if(c.title){ const t=document.createElement('div'); t.className='bl-title'; t.textContent=c.title; box.appendChild(t); }
+          c.rest.forEach(s=>{ const e=document.createElement('div'); e.className='bl-sub'; e.textContent=s; box.appendChild(e); });
+          bl.appendChild(box);
+        }
+      }
     } else {
-      bl.classList.add('auto'); bl.style.background=deepColor(STATE.bookTitle);
-      const rule=document.createElement('div'); rule.className='bl-rule'; bl.appendChild(rule);
-      const t=document.createElement('div'); t.className='bl-title'; t.textContent=STATE.bookTitle||'제목 없음'; bl.appendChild(t);
-      if(STATE.author){ const a=document.createElement('div'); a.className='bl-author'; a.textContent=STATE.author; bl.appendChild(a); }
+      // 규칙3: 이미지 없음 = 카드와 같은 색(제목 해시) 배경 + 제목(진하게·가운데) + 나머지(하단·옅게)
+      bl.classList.add('auto'); bl.style.background=deepColor(STATE.colorKey||STATE.bookTitle);
+      const c=coverText(explicit), title=c.title||STATE.bookTitle;
+      if(title){ const t=document.createElement('div'); t.className='bl-title'; t.textContent=title; bl.appendChild(t); }
+      if(c.rest.length){
+        const foot=document.createElement('div'); foot.className='bl-foot';
+        c.rest.forEach(s=>{ const e=document.createElement('div'); e.className='bl-sub'; e.textContent=s; foot.appendChild(e); });
+        bl.appendChild(foot);
+      }
     }
   }
   /* ===== 회귀 셀프테스트 (?selftest=1) ===== */
@@ -2106,7 +2149,7 @@ function assemble(md){
     if(page>=pages) page=pages-1; if(page<0) page=0;
     sorted.slice(page*PER_PAGE,(page+1)*PER_PAGE).forEach(d=>{
       const card=document.createElement('div'); card.className='card'; card.setAttribute('role','button'); card.tabIndex=0;
-      card.style.setProperty('--cv-bg', COVER_PAL[colorIdx(d.id||'')]); card.style.setProperty('--cv-ink', COVER_INK);
+      card.style.setProperty('--cv-bg', COVER_PAL[colorIdx(d.title||'')]); card.style.setProperty('--cv-ink', COVER_INK);
       const dateStr=fmtUpload(d.created_at);
       if(d.cover_thumb_path){
         const img=document.createElement('img'); img.className='card-img'; img.alt=''; img.loading='lazy'; img.src=coverUrl(d.cover_thumb_path, d.updated_at?new Date(d.updated_at).getTime():'');
@@ -2179,7 +2222,7 @@ function assemble(md){
     for(let i=0;i<pages;i++) pagerEl.appendChild(mk(String(i+1),i,{active:i===page}));
     pagerEl.appendChild(mk('›',Math.min(pages-1,page+1),{disabled:page===pages-1}));
   }
-  function openDoc(d){ hideDashboard(); if(V.loadManuscript) V.loadManuscript(d.content_md||'', d.cover_path?coverUrl(d.cover_path, d.updated_at?new Date(d.updated_at).getTime():''):''); }
+  function openDoc(d){ hideDashboard(); if(V.loadManuscript) V.loadManuscript(d.content_md||'', d.cover_path?coverUrl(d.cover_path, d.updated_at?new Date(d.updated_at).getTime():''):'', d.title||''); }
   async function onDelete(d){
     if(!window.confirm('이 원고를 삭제할까요?\n\n"'+(d.title||'제목 없음')+'"')) return;
     const paths=[d.cover_path,d.cover_thumb_path].filter(Boolean);
@@ -2461,7 +2504,7 @@ function assemble(md){
     if(error || !data || !data.ok){ hideLoading(); showExpired(); return; }
     setCookie(name);
     hideLoading();
-    if(V.loadManuscript){ const _cu=data.cover_path?sb.storage.from('covers').getPublicUrl(data.cover_path).data.publicUrl:''; V.loadManuscript(data.content_md||'', _cu); } else showExpired();
+    if(V.loadManuscript){ const _cu=data.cover_path?sb.storage.from('covers').getPublicUrl(data.cover_path).data.publicUrl:''; V.loadManuscript(data.content_md||'', _cu, data.title||''); } else showExpired();
   }
 
   // 진입: 유효성 먼저 확인 → 만료/이름입력 분기 (쿠키 있으면 이름 생략하고 바로 입장)
