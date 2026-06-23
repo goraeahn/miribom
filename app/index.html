@@ -450,6 +450,7 @@
   /* ① 인라인 편집기 (독립 모듈) */
   .editor-ov{position:fixed;inset:0;z-index:70;background:var(--bg,#faf7f2);display:flex;flex-direction:column;color:var(--ink)}
   body.editing-preview .editor-ov{display:none}
+  body.editing #dashboard{display:none}
   .ed-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;border-bottom:1px solid color-mix(in srgb,var(--ink) 10%,transparent)}
   .ed-status{font-size:13px;color:var(--muted)}
   .ed-status.dirty{color:#b8742a}
@@ -2389,7 +2390,7 @@ function assemble(md){
     window.__EDITOR.open(d, {
       save: async (md, title)=>{ const {error}=await sb.from('documents').update({content_md:md, title:title, updated_at:new Date().toISOString()}).eq('id',d.id); if(error) throw error; await loadDocs(); },
       pickCover: ()=>onSetCover(d),
-      onClosed: ()=>{}
+      onClosed: ()=>{ showDashboard(); showLib(); }
     });
   }
   async function onDelete(d){
