@@ -447,6 +447,29 @@
   .shares-readers-list{display:block;margin-top:3px;font-size:12px;color:var(--muted)}
   .shares-readers-list .nm{opacity:.8}
   .shares-empty,.shares-loading{color:var(--muted);font-size:14px;padding:26px 0;text-align:center}
+  /* ① 인라인 편집기 (독립 모듈) */
+  .editor-ov{position:fixed;inset:0;z-index:70;background:var(--bg,#faf7f2);display:flex;flex-direction:column;color:var(--ink)}
+  body.editing-preview .editor-ov{display:none}
+  .ed-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;border-bottom:1px solid color-mix(in srgb,var(--ink) 10%,transparent)}
+  .ed-status{font-size:13px;color:var(--muted)}
+  .ed-status.dirty{color:#b8742a}
+  .ed-bar-sp{flex:1}
+  .ed-btn{font:inherit;font-size:14px;padding:7px 14px;border-radius:9px;border:1px solid color-mix(in srgb,var(--ink) 18%,transparent);background:none;color:var(--ink);cursor:pointer;transition:background .14s}
+  .ed-btn:hover{background:color-mix(in srgb,var(--ink) 6%,transparent)}
+  .ed-btn.ed-save{background:var(--accent,#5651B8);color:#fff;border-color:transparent}
+  .ed-btn.ed-save:hover{filter:brightness(1.06);background:var(--accent,#5651B8)}
+  .ed-main{flex:1;min-height:0;display:flex;flex-direction:column;overflow:auto;padding:18px 16px;max-width:760px;width:100%;margin:0 auto;gap:14px;box-sizing:border-box}
+  .ed-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .ed-f{display:flex;flex-direction:column;font-size:12px;color:var(--muted);gap:4px}
+  .ed-f-wide{grid-column:1 / -1}
+  .ed-f input{font:inherit;font-size:15px;color:var(--ink);padding:9px 11px;border:1px solid color-mix(in srgb,var(--ink) 15%,transparent);border-radius:9px;background:var(--sheet,#fff)}
+  .ed-cover-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .ed-cover{font:inherit;font-size:13px;padding:8px 13px;border-radius:9px;border:1px solid color-mix(in srgb,var(--ink) 18%,transparent);background:none;color:var(--ink);cursor:pointer}
+  .ed-cover-hint{font-size:12px;color:var(--muted)}
+  .ed-text{flex:1;min-height:300px;font-family:var(--ui);font-size:15px;line-height:1.7;color:var(--ink);padding:14px;border:1px solid color-mix(in srgb,var(--ink) 13%,transparent);border-radius:11px;background:var(--sheet,#fff);resize:none;width:100%;box-sizing:border-box}
+  .ed-back{position:fixed;left:16px;top:13px;z-index:71;align-items:center;font:inherit;font-size:14px;padding:8px 14px;border-radius:9px;border:1px solid color-mix(in srgb,var(--ink) 18%,transparent);background:var(--bg,#faf7f2);color:var(--ink);cursor:pointer;display:none}
+  body.editing-preview .ed-back{display:inline-flex}
+  @media(max-width:560px){ .ed-grid{grid-template-columns:1fr} }
   .share-names{margin:9px 0 0;font-size:12.5px;color:var(--s-text);line-height:1.7}
   .share-names .nm{color:var(--s-muted)}
   .share-empty{font-size:12.5px;color:var(--s-muted);padding:2px 0 4px}
@@ -2173,7 +2196,7 @@ function assemble(md){
   /* ---------- 세션 ---------- */
   function applySession(s){ CUR=s; const user=s&&s.user;
     if(user){ authed=true; setAuthedUI(user); openAuth(false); loadDocs(); showDashboard(); }
-    else { const was=authed; authed=false; setAnonUI(); hideDashboard(); if(was&&V.resetHome) V.resetHome(); } }
+    else { const was=authed; authed=false; setAnonUI(); hideDashboard(); if(was&&V.resetHome) V.resetHome(); if(was&&window.__EDITOR) window.__EDITOR.clearDrafts(); } }
   sb.auth.getSession().then(({data})=>applySession(data.session));
   sb.auth.onAuthStateChange((_e,s)=>applySession(s));
 
@@ -2245,6 +2268,7 @@ function assemble(md){
       const ov=document.createElement('div'); ov.className='card-ov';
       const ovBtn=(label,svg,fn,danger,full)=>{ const b=document.createElement('button'); b.type='button'; b.className='ov-btn'+(danger?' danger':'')+(full?' full':''); b.innerHTML=svg+'<span>'+label+'</span>'; b.addEventListener('click',ev=>{ ev.stopPropagation(); fn(); }); return b; };
       ov.appendChild(ovBtn('뷰어',VIEW_ICON,()=>openDoc(d)));
+      ov.appendChild(ovBtn('수정','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>',()=>openEditor(d)));
       ov.appendChild(ovBtn(d.cover_thumb_path?'표지 교체':'표지',IMG_ICON,()=>onSetCover(d)));
       ov.appendChild(ovBtn('공유',SHARE_ICON,()=>openShareModal(d)));
       ov.appendChild(ovBtn('삭제',TRASH_ICON,()=>onDelete(d),true));
@@ -2360,6 +2384,14 @@ function assemble(md){
     pagerEl.appendChild(mk('›',Math.min(pages-1,page+1),{disabled:page===pages-1}));
   }
   function openDoc(d){ hideDashboard(); if(V.loadManuscript) V.loadManuscript(d.content_md||'', d.cover_path?coverUrl(d.cover_path, d.updated_at?new Date(d.updated_at).getTime():''):'', d.title||''); }
+  function openEditor(d){
+    if(!window.__EDITOR){ alert('편집기를 불러오지 못했습니다.'); return; }
+    window.__EDITOR.open(d, {
+      save: async (md, title)=>{ const {error}=await sb.from('documents').update({content_md:md, title:title, updated_at:new Date().toISOString()}).eq('id',d.id); if(error) throw error; await loadDocs(); },
+      pickCover: ()=>onSetCover(d),
+      onClosed: ()=>{}
+    });
+  }
   async function onDelete(d){
     if(!window.confirm('이 원고를 삭제할까요?\n\n"'+(d.title||'제목 없음')+'"')) return;
     const paths=[d.cover_path,d.cover_thumb_path].filter(Boolean);
@@ -2657,6 +2689,99 @@ function assemble(md){
     const saved=getCookie();
     if(saved) doEnter(saved); else showGate();
   })();
+})();
+</script>
+
+<!-- ① 인라인 편집기 (독립 모듈 — 추후 editor.js로 분리 가능) -->
+<div class="editor-ov" id="editor-overlay" hidden>
+  <div class="ed-bar">
+    <span class="ed-status" id="ed-status">저장됨</span>
+    <span class="ed-bar-sp"></span>
+    <button class="ed-btn" id="ed-preview-btn" type="button">미리보기</button>
+    <button class="ed-btn ed-save" id="ed-save" type="button">저장</button>
+    <button class="ed-btn" id="ed-close" type="button">닫기</button>
+  </div>
+  <div class="ed-main">
+    <div class="ed-grid">
+      <label class="ed-f">제목<input id="ed-title" type="text" autocomplete="off"></label>
+      <label class="ed-f">부제<input id="ed-subtitle" type="text" autocomplete="off"></label>
+      <label class="ed-f">저자<input id="ed-author" type="text" autocomplete="off"></label>
+      <label class="ed-f">출판사<input id="ed-publisher" type="text" autocomplete="off"></label>
+      <label class="ed-f">발행일<input id="ed-date" type="text" placeholder="2026-01-01" autocomplete="off"></label>
+      <label class="ed-f">식별자<input id="ed-identifier" type="text" autocomplete="off"></label>
+      <label class="ed-f ed-f-wide">판권<input id="ed-rights" type="text" autocomplete="off"></label>
+    </div>
+    <div class="ed-cover-row">
+      <button class="ed-cover" id="ed-cover" type="button">표지 이미지…</button>
+      <span class="ed-cover-hint">표지는 바로 저장됩니다(본문 저장과 별개)</span>
+    </div>
+    <textarea class="ed-text" id="ed-text" placeholder="본문을 여기서 고칠 수 있어요…" spellcheck="false"></textarea>
+  </div>
+  <button class="ed-back" id="ed-back-btn" type="button">← 편집으로</button>
+</div>
+<script>
+/* ① 인라인 편집기 — 독립 IIFE. 바깥과는 parseYAML·serializeFront·window.__MV·콜백으로만 대화 */
+(function(){
+  "use strict";
+  const $=s=>document.querySelector(s);
+  const ov=$('#editor-overlay'); if(!ov) return;
+  const fEls={ title:$('#ed-title'), subtitle:$('#ed-subtitle'), author:$('#ed-author'),
+    publisher:$('#ed-publisher'), date:$('#ed-date'), identifier:$('#ed-identifier'), rights:$('#ed-rights') };
+  const bodyEl=$('#ed-text'), statusEl=$('#ed-status'), saveBtn=$('#ed-save'), closeBtn=$('#ed-close'),
+    prevBtn=$('#ed-preview-btn'), backBtn=$('#ed-back-btn'), coverBtn=$('#ed-cover');
+  let cur=null, cb=null, meta0={}, saved=true, draftTimer=0;
+  const DKEY=id=>'mrb_draft_'+id;
+
+  function curMeta(){ const m={...meta0}; for(const k in fEls){ const v=fEls[k].value.trim(); if(v) m[k]=v; else delete m[k]; } return m; }
+  function buildMd(){ return (typeof serializeFront==='function'?serializeFront(curMeta()):'') + bodyEl.value; }
+  function setStatus(dirty){ statusEl.textContent = dirty ? '수정함 · 저장 안 됨' : '저장됨'; statusEl.classList.toggle('dirty', !!dirty); }
+  function scheduleDraft(){ clearTimeout(draftTimer); draftTimer=setTimeout(()=>{ if(cur){ try{ localStorage.setItem(DKEY(cur.id), JSON.stringify({md:buildMd()})); }catch(_){ } } }, 1500); }
+  function markDirty(){ saved=false; setStatus(true); scheduleDraft(); }
+  function fillFrom(md){ const r=parseYAML(md||''); meta0={...r.meta}; for(const k in fEls){ fEls[k].value=r.meta[k]||''; } bodyEl.value=(r.rest||'').replace(/^\n+/,''); }
+
+  function open(doc, callbacks){
+    cur=doc; cb=callbacks||{}; saved=true;
+    let draft=null; try{ draft=JSON.parse(localStorage.getItem(DKEY(doc.id))||'null'); }catch(_){ }
+    if(draft && draft.md && draft.md!==(doc.content_md||'') && window.confirm('지난번 저장하지 않고 닫은 편집 내용이 있어요.\n이어서 편집할까요?  (취소 = 원본으로 시작)')){
+      fillFrom(draft.md); saved=false;
+    } else { fillFrom(doc.content_md||''); try{ localStorage.removeItem(DKEY(doc.id)); }catch(_){ } }
+    setStatus(!saved);
+    document.body.classList.add('editing'); document.body.classList.remove('editing-preview');
+    ov.hidden=false; setTimeout(()=>{ try{ fEls.title.focus(); }catch(_){ } }, 50);
+  }
+  function showPreview(){ document.body.classList.add('editing-preview');
+    if(window.__MV && window.__MV.loadManuscript){ const t=fEls.title.value.trim()||(cur&&cur.title)||''; window.__MV.loadManuscript(buildMd(), '', t); } }
+  function backToEdit(){ document.body.classList.remove('editing-preview'); }
+
+  async function doSave(){
+    if(!cur||!cb||!cb.save) return false;
+    saveBtn.disabled=true; saveBtn.textContent='저장 중…';
+    try{ const md=buildMd(), title=fEls.title.value.trim()||cur.title||'제목 없음';
+      await cb.save(md, title);
+      cur.content_md=md; cur.title=title; meta0=curMeta(); saved=true; setStatus(false);
+      try{ localStorage.removeItem(DKEY(cur.id)); }catch(_){ }
+      return true;
+    }catch(e){ alert('저장 실패: '+(e&&e.message||e)); return false; }
+    finally{ saveBtn.disabled=false; saveBtn.textContent='저장'; }
+  }
+  function finishClose(){ document.body.classList.remove('editing','editing-preview'); ov.hidden=true; const f=cb&&cb.onClosed; cur=null; cb=null; if(f) f(); }
+  function close(){
+    if(saved){ finishClose(); return; }
+    if(window.confirm('저장하지 않은 변경이 있어요. 저장하고 닫을까요?  (확인 = 저장 후 닫기)')){ doSave().then(ok=>{ if(ok) finishClose(); }); return; }
+    if(window.confirm('저장 없이 닫을까요?\n작업은 초안으로 보관돼 다음에 이어서 편집할 수 있어요.  (취소 = 계속 편집)')){ finishClose(); }
+  }
+
+  Object.values(fEls).forEach(el=>el.addEventListener('input',markDirty));
+  bodyEl.addEventListener('input',markDirty);
+  saveBtn.onclick=doSave; closeBtn.onclick=close;
+  if(prevBtn) prevBtn.onclick=showPreview;
+  if(backBtn) backBtn.onclick=backToEdit;
+  if(coverBtn) coverBtn.onclick=()=>{ if(cb&&cb.pickCover) cb.pickCover(); };
+  document.addEventListener('keydown',e=>{ if(!document.body.classList.contains('editing')) return;
+    if((e.ctrlKey||e.metaKey)&&(e.key==='s'||e.key==='S')){ e.preventDefault(); doSave(); }
+    else if(e.key==='Escape' && !document.body.classList.contains('editing-preview')){ close(); } });
+
+  window.__EDITOR={ open, clearDrafts(){ try{ Object.keys(localStorage).forEach(k=>{ if(k.indexOf('mrb_draft_')===0) localStorage.removeItem(k); }); }catch(_){ } } };
 })();
 </script>
 
