@@ -422,6 +422,31 @@
   .share-revoke{flex:0 0 auto;font-size:12px;font-family:inherit;color:#c0392b;background:none;border:1px solid color-mix(in srgb,#c0392b 35%,var(--s-border));border-radius:8px;padding:5px 10px;cursor:pointer;transition:background .15s,color .15s}
   .share-revoke:hover{background:#c0392b;color:#fff;border-color:#c0392b}
   .share-link-revoked{opacity:.55}
+  /* ③ 공유 현황 (대시보드 — 일반 테마, 공유화면 아이리스 토큰 미사용) */
+  .shares-view{max-width:760px}
+  .shares-head{margin:0 0 18px}
+  .shares-head h2{font-size:20px;margin:0 0 8px;color:var(--ink)}
+  .shares-caveat{font-size:12.5px;line-height:1.65;color:var(--muted);background:color-mix(in srgb,var(--ink) 4%,transparent);border-radius:10px;padding:10px 13px;margin:0}
+  .shares-caveat b{color:var(--ink);font-weight:600}
+  .shares-group{margin:0 0 22px}
+  .shares-doc-title{font-family:var(--serif);font-size:16px;font-weight:600;color:var(--ink);margin:0 0 9px;padding-bottom:6px;border-bottom:1px solid color-mix(in srgb,var(--ink) 12%,transparent)}
+  .shares-link{border:1px solid color-mix(in srgb,var(--ink) 11%,transparent);border-radius:12px;padding:11px 14px;margin:0 0 9px}
+  .shares-link.is-off{opacity:.62}
+  .shares-link-top{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+  .shares-badge{font-size:11.5px;font-weight:600;padding:3px 9px;border-radius:999px}
+  .shares-badge.st-active{background:color-mix(in srgb,#2e7d52 16%,transparent);color:#266b46}
+  .shares-badge.st-expired{background:color-mix(in srgb,var(--ink) 9%,transparent);color:var(--muted)}
+  .shares-badge.st-revoked{background:color-mix(in srgb,#c0392b 13%,transparent);color:#a23026}
+  .shares-period{font-size:12.5px;color:var(--muted)}
+  .shares-close{font-size:12.5px;color:var(--ink)}
+  .shares-revoke-btn{margin-left:auto;font:inherit;font-size:12px;color:#c0392b;background:none;border:1px solid color-mix(in srgb,#c0392b 35%,transparent);border-radius:8px;padding:5px 11px;cursor:pointer;transition:background .15s,color .15s}
+  .shares-revoke-btn:hover{background:#c0392b;color:#fff;border-color:#c0392b}
+  .shares-readers{margin-top:9px;font-size:13px;color:var(--ink);line-height:1.6}
+  .shares-readers b{font-weight:600}
+  .shares-readers.shares-none{color:var(--muted);font-size:12.5px}
+  .shares-readers-list{display:block;margin-top:3px;font-size:12px;color:var(--muted)}
+  .shares-readers-list .nm{opacity:.8}
+  .shares-empty,.shares-loading{color:var(--muted);font-size:14px;padding:26px 0;text-align:center}
   .share-names{margin:9px 0 0;font-size:12.5px;color:var(--s-text);line-height:1.7}
   .share-names .nm{color:var(--s-muted)}
   .share-empty{font-size:12.5px;color:var(--s-muted);padding:2px 0 4px}
@@ -596,10 +621,12 @@
             <nav class="pager" id="pager"></nav>
           </div>
           <article class="doc-page" id="page-view" hidden></article>
+          <section class="shares-view" id="shares-view" hidden></section>
         </div>
         <aside class="dash-side">
           <nav class="side-nav">
             <button class="side-link active" type="button" data-view="lib">나의 서재</button>
+            <button class="side-link" type="button" data-view="shares">공유 현황</button>
             <button class="side-link" type="button" data-page="public">공용 서재</button>
             <button class="side-link" type="button" data-page="guide">이용 안내</button>
             <button class="side-link" type="button" data-page="faq">자주 묻는 질문</button>
@@ -2240,10 +2267,74 @@ function assemble(md){
       if(ln.trim()===''){ cl(); i++; continue; }
       cl(); let p=ln; i++; while(i<L.length&&L[i].trim()!==''&&!/^(#{1,4}\s|[-*]\s|\d+\.\s|>\s?|```)/.test(L[i])){ p+=' '+L[i]; i++; } h+='<p>'+mdInline(p)+'</p>';
     } cl(); return h; }
-  function setActiveNav(k){ document.querySelectorAll('.side-link').forEach(b=>b.classList.toggle('active',(k==='lib'&&b.dataset.view==='lib')||b.dataset.page===k)); }
-  function showLib(){ const lv=document.getElementById('lib-view'),pv=document.getElementById('page-view'); if(lv)lv.hidden=false; if(pv)pv.hidden=true; setActiveNav('lib'); }
-  function showPage(key){ const sc=document.getElementById('page-'+key),pv=document.getElementById('page-view'),lv=document.getElementById('lib-view'); if(!sc||!pv) return; pv.innerHTML=mdToHtml(sc.textContent); pv.hidden=false; if(lv)lv.hidden=true; setActiveNav(key); const dd=document.getElementById('dashboard'); if(dd) dd.scrollTop=0; }
-  document.querySelectorAll('.side-link').forEach(b=>{ b.onclick=()=>{ if(b.dataset.view==='lib') showLib(); else showPage(b.dataset.page); }; });
+  function hideDashViews(){ ['lib-view','page-view','shares-view'].forEach(id=>{ const e=document.getElementById(id); if(e) e.hidden=true; }); }
+  function setActiveNav(k){ document.querySelectorAll('.side-link').forEach(b=>b.classList.toggle('active',(k==='lib'&&b.dataset.view==='lib')||(k==='shares'&&b.dataset.view==='shares')||b.dataset.page===k)); }
+  function showLib(){ hideDashViews(); const lv=document.getElementById('lib-view'); if(lv)lv.hidden=false; setActiveNav('lib'); }
+  function showPage(key){ const sc=document.getElementById('page-'+key); if(!sc) return; hideDashViews(); const pv=document.getElementById('page-view'); pv.innerHTML=mdToHtml(sc.textContent); pv.hidden=false; setActiveNav(key); const dd=document.getElementById('dashboard'); if(dd) dd.scrollTop=0; }
+  /* ---------- ③ 공유 현황 (저자 대시보드) ---------- */
+  function showShares(){ hideDashViews(); const sv=document.getElementById('shares-view'); if(sv)sv.hidden=false; setActiveNav('shares'); const dd=document.getElementById('dashboard'); if(dd) dd.scrollTop=0; loadAllShares(); }
+  async function loadAllShares(){
+    const sv=document.getElementById('shares-view'); if(!sv) return;
+    sv.innerHTML='<div class="shares-loading">불러오는 중…</div>';
+    const uid=CUR&&CUR.user&&CUR.user.id;
+    const {data:links,error}=await sb.from('shares')
+      .select('id,document_id,title,token,period,expires_at,is_active,created_at')
+      .eq('owner_id',uid).order('created_at',{ascending:false});
+    if(error){ sv.innerHTML='<div class="shares-empty">공유 현황을 불러오지 못했습니다.</div>'; return; }
+    const ids=(links||[]).map(l=>l.id); let events=[];
+    if(ids.length){
+      const {data:ev}=await sb.from('share_access_events')
+        .select('share_id,viewer_name,occurred_at').in('share_id',ids).order('occurred_at',{ascending:false});
+      events=ev||[];
+    }
+    renderSharesDashboard(links||[],events);
+  }
+  function closeStatusText(l,expired){
+    if(!l.is_active) return '내가 회수함';
+    if(expired) return '자동으로 닫힘 · '+fmtExpiry(l.expires_at);
+    if(!l.expires_at) return '만료 없음';
+    const days=Math.ceil((new Date(l.expires_at)-new Date())/86400000);
+    if(days<=0) return '오늘 닫힘';
+    if(days===1) return '내일 닫힘 · '+fmtExpiry(l.expires_at);
+    return days+'일 후 닫힘 · '+fmtExpiry(l.expires_at);
+  }
+  function renderSharesDashboard(links,events){
+    const sv=document.getElementById('shares-view'); if(!sv) return;
+    const byShare={}; events.forEach(e=>{ (byShare[e.share_id]=byShare[e.share_id]||[]).push(e); });
+    let html='<div class="shares-head"><h2>공유 현황</h2><p class="shares-caveat">받는 사람이 적는 <b>이름은 식별용</b>이라 가명·중복일 수 있어요(확정 증거 아님). 기록은 <b>읽기 시작(이름 제출)</b> 시점이며, IP 같은 개인정보는 표시하지 않습니다.</p></div>';
+    if(!links.length){ sv.innerHTML=html+'<div class="shares-empty">아직 공유한 원고가 없어요. 서재의 원고 카드에서 공유 링크를 만들 수 있어요.</div>'; return; }
+    const groups=[],gmap={};
+    links.forEach(l=>{ const k=l.document_id||l.id; if(!gmap[k]){ gmap[k]={title:l.title,links:[]}; groups.push(gmap[k]); } gmap[k].links.push(l); });
+    groups.forEach(g=>{
+      html+='<div class="shares-group"><div class="shares-doc-title">'+escapeName(g.title||'제목 없음')+'</div>';
+      g.links.forEach(l=>{
+        const evs=byShare[l.id]||[];
+        const expired=l.expires_at && new Date(l.expires_at)<new Date();
+        const active=l.is_active && !expired;
+        const stateCls=!l.is_active?'st-revoked':(expired?'st-expired':'st-active');
+        const stateTxt=!l.is_active?'회수함':(expired?'닫힘':'열려 있음');
+        const distinct=new Set(evs.map(e=>(e.viewer_name||'').trim())).size, total=evs.length;
+        html+='<div class="shares-link '+(active?'':'is-off')+'"><div class="shares-link-top">'
+          +'<span class="shares-badge '+stateCls+'">'+stateTxt+'</span>'
+          +'<span class="shares-period">'+(PERIOD_LABEL[l.period]||'')+'</span>'
+          +'<span class="shares-close">'+closeStatusText(l,expired)+'</span>'
+          +(active?'<button class="shares-revoke-btn" type="button" data-share="'+l.id+'">회수</button>':'')
+          +'</div>';
+        if(total){ html+='<div class="shares-readers"><b>'+distinct+'명</b>이 <b>'+total+'번</b> 열람<span class="shares-readers-list">'+evs.map(e=>escapeName(e.viewer_name)+' <span class="nm">('+fmtDate(e.occurred_at)+')</span>').join(' · ')+'</span></div>'; }
+        else { html+='<div class="shares-readers shares-none">아직 아무도 열지 않았어요</div>'; }
+        html+='</div>';
+      });
+      html+='</div>';
+    });
+    sv.innerHTML=html;
+    sv.querySelectorAll('.shares-revoke-btn').forEach(btn=>{ btn.onclick=async()=>{
+      if(!window.confirm('이 공유 링크를 회수할까요?\n회수하면 받은 사람은 더 이상 열 수 없습니다.')) return;
+      const {error}=await sb.from('shares').update({is_active:false}).eq('id',btn.dataset.share);
+      if(error){ alert('회수 실패: '+error.message); return; }
+      loadAllShares();
+    }; });
+  }
+  document.querySelectorAll('.side-link').forEach(b=>{ b.onclick=()=>{ if(b.dataset.view==='lib') showLib(); else if(b.dataset.view==='shares') showShares(); else showPage(b.dataset.page); }; });
   const wmHome=document.querySelector('.wordmark');
   if(wmHome) wmHome.onclick=()=>{ if(document.body.classList.contains('doc-open') && !window.confirm('문서를 닫고 나의 서재로 돌아가시겠습니까?')) return; if(authed){ showDashboard(); showLib(); } else if(V.resetHome) V.resetHome(); };
   function renderPager(pages){ pagerEl.innerHTML=''; if(pages<=1) return;
