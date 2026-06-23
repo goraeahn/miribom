@@ -447,6 +447,42 @@
   .shares-readers-list{display:block;margin-top:3px;font-size:12px;color:var(--muted)}
   .shares-readers-list .nm{opacity:.8}
   .shares-empty,.shares-loading{color:var(--muted);font-size:14px;padding:26px 0;text-align:center}
+
+  /* ② 공용 서재 (그리드 + 공개 모달) — 앱 본체이므로 일반 테마 사용 */
+  .public-view{max-width:1080px}
+  .public-head{margin:0 0 16px}
+  .public-head h2{font-size:20px;margin:0 0 6px;color:var(--ink)}
+  .public-head p{font-size:13px;color:var(--muted);margin:0;line-height:1.6}
+  .pub-tabs{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 18px}
+  .pub-tab{font:inherit;font-size:13px;padding:7px 13px;border-radius:999px;border:1px solid color-mix(in srgb,var(--ink) 14%,transparent);background:none;color:var(--muted);cursor:pointer;transition:border-color .14s,background .14s,color .14s}
+  .pub-tab:hover{border-color:var(--accent);color:var(--ink)}
+  .pub-tab.on{background:var(--accent);border-color:var(--accent);color:#fff}
+  .public-empty,.public-loading{color:var(--muted);font-size:14px;padding:40px 0;text-align:center}
+  .pub-cat-badge{position:absolute;top:7px;left:7px;z-index:2;font-size:11px;font-weight:600;color:#fff;background:rgba(18,17,22,.5);border-radius:999px;padding:2px 9px;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+  .card-pub-flag{position:absolute;top:7px;right:7px;z-index:2;font-size:10.5px;font-weight:700;color:#fff;background:color-mix(in srgb,var(--accent) 85%,#000);border-radius:999px;padding:2px 8px;letter-spacing:.02em}
+
+  /* 공개 모달 (작성자) — .modal-bg 백드롭 재사용, 일반 테마 */
+  .pub-card{position:relative;width:min(440px,100%);max-height:88vh;overflow:auto;background:var(--sheet,#fff);color:var(--ink);border:1px solid color-mix(in srgb,var(--ink) 12%,transparent);border-radius:18px;padding:26px 24px 22px;box-shadow:0 30px 80px -30px rgba(0,0,0,.5)}
+  .pub-h{margin:0 0 4px;font-size:19px;color:var(--ink);font-weight:700}
+  .pub-sub{margin:0 0 18px;font-size:13px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .pub-label{display:block;font-size:12.5px;font-weight:600;color:var(--muted);margin:0 0 8px}
+  .pub-field{margin:0 0 16px}
+  .pub-cats{display:flex;flex-wrap:wrap;gap:7px}
+  .pub-cats button{font:inherit;font-size:13px;padding:8px 12px;border-radius:9px;border:1px solid color-mix(in srgb,var(--ink) 15%,transparent);background:none;color:var(--ink);cursor:pointer;transition:border-color .14s,background .14s,color .14s}
+  .pub-cats button:hover{border-color:var(--accent)}
+  .pub-cats button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+  .pub-primary{width:100%;padding:12px;font-size:14px;font-weight:700;font-family:inherit;color:#fff;background:var(--accent);border:1px solid var(--accent);border-radius:11px;cursor:pointer;transition:filter .15s}
+  .pub-primary:hover{filter:brightness(1.06)}
+  .pub-primary:disabled{opacity:.55;cursor:default;filter:none}
+  .pub-url-row{display:flex;gap:7px;align-items:stretch;margin:0 0 12px}
+  .pub-url{flex:1;min-width:0;padding:10px 12px;font-size:13px;font-family:inherit;color:var(--ink);background:color-mix(in srgb,var(--ink) 4%,transparent);border:1px solid color-mix(in srgb,var(--ink) 12%,transparent);border-radius:10px}
+  .pub-copy{flex:0 0 auto;padding:10px 16px;font-size:13px;font-weight:600;font-family:inherit;color:#fff;background:var(--accent);border:1px solid var(--accent);border-radius:10px;cursor:pointer;white-space:nowrap}
+  .pub-live-btns{display:flex;gap:8px}
+  .pub-ghost{flex:1;padding:10px;font-size:13px;font-family:inherit;color:var(--ink);background:none;border:1px solid color-mix(in srgb,var(--ink) 18%,transparent);border-radius:10px;cursor:pointer;transition:background .14s}
+  .pub-ghost:hover{background:color-mix(in srgb,var(--ink) 6%,transparent)}
+  .pub-revoke{flex:1;padding:10px;font-size:13px;font-family:inherit;color:#c0392b;background:none;border:1px solid color-mix(in srgb,#c0392b 35%,transparent);border-radius:10px;cursor:pointer;transition:background .15s,color .15s}
+  .pub-revoke:hover{background:#c0392b;color:#fff;border-color:#c0392b}
+  .pub-help{margin:10px 0 0;font-size:12px;color:var(--muted);line-height:1.55}
   /* ① 인라인 편집기 (독립 모듈) — 레이어 팝업(딤+모달), 좌:본문 / 우:책정보 */
   .editor-ov{position:fixed;inset:0;z-index:70;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(18,17,22,.46);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);box-sizing:border-box}
   body.editing{overflow:hidden}
@@ -514,6 +550,15 @@
   body.share-mode #user-chip{display:none!important}
   body.share-mode .wordmark{cursor:default;pointer-events:none}
   body.share-mode #empty{display:none!important}
+  /* 공용 서재 공개 읽기(?work=) — 읽기전용 크롬 숨김. 워드마크는 클릭 가능(홈으로) */
+  body.public-mode #open-btn,
+  body.public-mode .upload-toggle,
+  body.public-mode #info-btn,
+  body.public-mode #login-btn,
+  body.public-mode #signup-btn,
+  body.public-mode #logout-btn,
+  body.public-mode #user-chip{display:none!important}
+  body.public-mode #empty{display:none!important}
 
   /* ===== V1.1: 읽기 도구막대 — 접기/펴기(몰입) + 모바일 바텀시트 ===== */
   /* 상단 바 접기/펴기 (읽는 중에만 노출되는 플로팅 버튼) */
@@ -659,6 +704,15 @@
           </div>
           <article class="doc-page" id="page-view" hidden></article>
           <section class="shares-view" id="shares-view" hidden></section>
+          <section class="public-view" id="public-view" hidden>
+            <div class="public-head">
+              <h2>공용 서재</h2>
+              <p>작가가 직접 공개를 선택한 원고들입니다. 가입 없이 누구나 읽을 수 있어요.</p>
+            </div>
+            <div class="pub-tabs" id="pub-tabs"></div>
+            <div class="cards" id="public-cards"></div>
+            <div class="public-empty" id="public-empty" hidden>아직 공개된 글이 없어요.</div>
+          </section>
         </div>
         <aside class="dash-side">
           <nav class="side-nav">
@@ -720,6 +774,37 @@
       <div class="share-status-h">열람 현황</div>
       <div id="share-list"></div>
     </div>
+  </div>
+</div>
+
+<!-- 공용 서재 공개 (작성자) -->
+<div class="modal-bg" id="publish-modal" hidden>
+  <div class="pub-card">
+    <button class="modal-x" id="pub-close" aria-label="닫기">×</button>
+    <h3 class="pub-h">공용 서재에 공개</h3>
+    <p class="pub-sub" id="pub-sub">제목</p>
+
+    <div class="pub-field">
+      <span class="pub-label">분류</span>
+      <div class="pub-cats" id="pub-cats"></div>
+    </div>
+
+    <button class="pub-primary" id="pub-publish" type="button">공용 서재에 공개</button>
+
+    <div id="pub-live" hidden>
+      <span class="pub-label" style="margin-top:16px">공개 주소</span>
+      <div class="pub-url-row">
+        <input class="pub-url" id="pub-url" readonly>
+        <button class="pub-copy" id="pub-copy" type="button">복사</button>
+      </div>
+      <div class="pub-live-btns">
+        <button class="pub-ghost" id="pub-republish" type="button">공개본 갱신</button>
+        <button class="pub-revoke" id="pub-unpublish" type="button">공용 서재에서 내리기</button>
+      </div>
+      <p class="pub-help">원본을 고쳐도 공개본은 그대로예요. ‘공개본 갱신’을 누르면 지금 내용·표지로 다시 굳힙니다. 분류를 바꾼 뒤 갱신하면 분류도 바뀝니다.</p>
+    </div>
+
+    <p class="pub-help" id="pub-warn">공개하면 누구나 가입 없이 읽을 수 있고 검색에 노출될 수 있어요. 언제든 내릴 수 있습니다.</p>
   </div>
 </div>
 
@@ -2109,7 +2194,7 @@ function assemble(md){
 (function(){
   const $=s=>document.querySelector(s);
   // 공유 뷰어 모드(?t=토큰)에서는 대시보드/인증을 초기화하지 않는다. 아래 별도 IIFE 가 담당.
-  if(new URLSearchParams(location.search).get('t')) return;
+  if(new URLSearchParams(location.search).get('t') || new URLSearchParams(location.search).get('work')) return;
   const cfg=window.MIRIBOM_CONFIG, sbLib=window.supabase, V=window.__MV||{};
   const loginBtn=$('#login-btn'), signupBtn=$('#signup-btn'),
         logoutBtn=$('#logout-btn'), userChip=$('#user-chip');
@@ -2126,7 +2211,8 @@ function assemble(md){
   // v2 자동표지 8색 (깊은 탈색 톤) — hash(id)%8로 결정론적
   const COVER_PAL=['#2C2B52','#1F4540','#4A2230','#26402B','#2E3A4F','#3A2A4A','#5A3320','#353A2E'];
   const COVER_INK='#ECE4D2';
-  let CUR=null, authed=false, docs=[], page=0, mode='login', sortMode='newest';
+  let CUR=null, authed=false, docs=[], page=0, mode='login', sortMode='newest', pubByDoc={};
+  const PUB_CATS=['일반소설','장르소설','시·시집','에세이·산문','동화','안내서·실용'];
   function colorIdx(id){ let s=0; for(let i=0;i<(id||'').length;i++) s+=id.charCodeAt(i); return s%COVER_PAL.length; }
   function metaVal(md,key){ const m=(md||'').match(/^---\s*\n([\s\S]*?)\n---/); if(!m) return ''; const ln=m[1].split('\n').find(l=>new RegExp('^\\s*'+key+'\\s*:','i').test(l)); return ln?ln.slice(ln.indexOf(':')+1).trim().replace(/^["']|["']$/g,''):''; }
   function fmtUpload(iso){ const d=new Date(iso); if(isNaN(d)) return ''; const now=new Date(); const t0=new Date(now.getFullYear(),now.getMonth(),now.getDate()); const t1=new Date(d.getFullYear(),d.getMonth(),d.getDate()); const diff=Math.round((t0-t1)/86400000); const hm=d.getHours()+'시 '+String(d.getMinutes()).padStart(2,'0')+'분'; if(diff===0) return '오늘 '+hm; if(diff===1) return '어제 '+hm; if(d.getFullYear()===now.getFullYear()) return (d.getMonth()+1)+'월 '+d.getDate()+'일'; return d.getFullYear()+'. '+(d.getMonth()+1)+'. '+d.getDate()+'.'; }
@@ -2224,7 +2310,14 @@ function assemble(md){
     loading.hidden=true;
     docs = error ? [] : (data||[]);
     if(error) console.warn('loadDocs',error);
+    await loadMyPublished();
     renderLimit(); renderCards();
+  }
+  async function loadMyPublished(){
+    pubByDoc={};
+    const uid=CUR&&CUR.user&&CUR.user.id; if(!uid) return;
+    const {data}=await sb.from('public_works').select('document_id,slug,category,is_active').eq('owner_id',uid);
+    (data||[]).forEach(w=>{ pubByDoc[w.document_id]=w; });
   }
   function renderLimit(){ const full=docs.length>=LIMIT;
     limitEl.hidden=!full; dropzone.classList.toggle('disabled',full); }
@@ -2249,6 +2342,7 @@ function assemble(md){
   const TRASH_ICON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2m2 0v14a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V6"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>';
   const XMARK_ICON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m15 9-6 6M9 9l6 6"/></svg>';
   const LAYERS_ICON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="m2 12 10 5 10-5"/><path d="m2 17 10 5 10-5"/></svg>';
+  const GLOBE_ICON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18a14 14 0 0 1 0-18Z"/></svg>';
   function renderCards(){
     renderCount();
     cardsEl.innerHTML=''; dashEmpty.hidden=docs.length>0;
@@ -2285,6 +2379,7 @@ function assemble(md){
       const edBtn=ovBtn('수정','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>',()=>openEditor(d)); edBtn.classList.add('ov-edit'); ov.appendChild(edBtn);
       ov.appendChild(ovBtn(d.cover_thumb_path?'표지 교체':'표지',IMG_ICON,()=>onSetCover(d)));
       ov.appendChild(ovBtn('공유',SHARE_ICON,()=>openShareModal(d)));
+      ov.appendChild(ovBtn('공개',GLOBE_ICON,()=>openPublishModal(d)));
       ov.appendChild(ovBtn('삭제',TRASH_ICON,()=>onDelete(d),true));
       ov.appendChild(ovBtn('다운로드',DL_ICON,()=>downloadDoc(d,{stopPropagation(){}}),false,true));
       if(d.cover_thumb_path) ov.appendChild(ovBtn('표지 제거',XMARK_ICON,()=>onRemoveCover(d),false,true));
@@ -2319,7 +2414,7 @@ function assemble(md){
       if(ln.trim()===''){ cl(); i++; continue; }
       cl(); let p=ln; i++; while(i<L.length&&L[i].trim()!==''&&!/^(#{1,4}\s|[-*]\s|\d+\.\s|>\s?|```)/.test(L[i])){ p+=' '+L[i]; i++; } h+='<p>'+mdInline(p)+'</p>';
     } cl(); return h; }
-  function hideDashViews(){ ['lib-view','page-view','shares-view'].forEach(id=>{ const e=document.getElementById(id); if(e) e.hidden=true; }); }
+  function hideDashViews(){ ['lib-view','page-view','shares-view','public-view'].forEach(id=>{ const e=document.getElementById(id); if(e) e.hidden=true; }); }
   function setActiveNav(k){ document.querySelectorAll('.side-link').forEach(b=>b.classList.toggle('active',(k==='lib'&&b.dataset.view==='lib')||(k==='shares'&&b.dataset.view==='shares')||b.dataset.page===k)); }
   function showLib(){ hideDashViews(); const lv=document.getElementById('lib-view'); if(lv)lv.hidden=false; setActiveNav('lib'); }
   function showPage(key){ const sc=document.getElementById('page-'+key); if(!sc) return; hideDashViews(); const pv=document.getElementById('page-view'); pv.innerHTML=mdToHtml(sc.textContent); pv.hidden=false; setActiveNav(key); const dd=document.getElementById('dashboard'); if(dd) dd.scrollTop=0; }
@@ -2386,7 +2481,104 @@ function assemble(md){
       loadAllShares();
     }; });
   }
-  document.querySelectorAll('.side-link').forEach(b=>{ b.onclick=()=>{ if(b.dataset.view==='lib') showLib(); else if(b.dataset.view==='shares') showShares(); else showPage(b.dataset.page); }; });
+  /* ---------- ② 공용 서재 (그리드 + 공개 모달) ---------- */
+  let pubCat='전체';
+  function showPublic(){ hideDashViews(); const pv=document.getElementById('public-view'); if(pv)pv.hidden=false; setActiveNav('public'); const dd=document.getElementById('dashboard'); if(dd) dd.scrollTop=0; renderPubTabs(); loadPublicWorks(); }
+  function renderPubTabs(){
+    const t=document.getElementById('pub-tabs'); if(!t) return; t.innerHTML='';
+    ['전체'].concat(PUB_CATS).forEach(c=>{ const b=document.createElement('button'); b.type='button'; b.className='pub-tab'+(c===pubCat?' on':''); b.textContent=c;
+      b.onclick=()=>{ pubCat=c; renderPubTabs(); loadPublicWorks(); }; t.appendChild(b); });
+  }
+  async function loadPublicWorks(){
+    const grid=document.getElementById('public-cards'), empty=document.getElementById('public-empty');
+    if(!grid) return; grid.innerHTML='<div class="public-loading">불러오는 중…</div>'; if(empty) empty.hidden=true;
+    let q=sb.from('public_works').select('slug,title,cover_path,category,updated_at').eq('is_active',true).order('updated_at',{ascending:false});
+    if(pubCat!=='전체') q=q.eq('category',pubCat);
+    const {data,error}=await q;
+    grid.innerHTML='';
+    if(error){ grid.innerHTML='<div class="public-empty">공용 서재를 불러오지 못했습니다.</div>'; return; }
+    if(!data||!data.length){ if(empty) empty.hidden=false; return; }
+    data.forEach(w=>grid.appendChild(buildPublicCard(w)));
+  }
+  function buildPublicCard(w){
+    const card=document.createElement('div'); card.className='card'; card.setAttribute('role','button'); card.tabIndex=0;
+    card.style.setProperty('--cv-bg', COVER_PAL[colorIdx(w.title||'')]); card.style.setProperty('--cv-ink', COVER_INK);
+    if(w.cover_path){
+      const img=document.createElement('img'); img.className='card-img'; img.alt=''; img.loading='lazy';
+      img.src=coverUrl(w.cover_path, w.updated_at?new Date(w.updated_at).getTime():'');
+      const scrim=document.createElement('div'); scrim.className='card-scrim';
+      const meta=document.createElement('div'); meta.className='cv-meta-img';
+      const ti=document.createElement('div'); ti.className='cv-title-img'; ti.textContent=w.title||'제목 없음'; meta.appendChild(ti);
+      card.appendChild(img); card.appendChild(scrim); card.appendChild(meta);
+    } else {
+      const cover=document.createElement('div'); cover.className='card-cover';
+      const rule=document.createElement('div'); rule.className='cv-rule';
+      const ttl=document.createElement('div'); ttl.className='cv-title'; ttl.textContent=w.title||'제목 없음';
+      cover.appendChild(rule); cover.appendChild(ttl); card.appendChild(cover);
+    }
+    const cb=document.createElement('div'); cb.className='pub-cat-badge'; cb.textContent=w.category||''; card.appendChild(cb);
+    const go=()=>{ location.href=shareOrigin()+'?work='+encodeURIComponent(w.slug); };
+    card.addEventListener('click',go);
+    card.addEventListener('keydown',ev=>{ if(ev.key==='Enter'||ev.key===' '){ ev.preventDefault(); go(); } });
+    return card;
+  }
+  /* 공개 모달 (작성자) */
+  const pubModal=document.getElementById('publish-modal');
+  let pubDoc=null, pubSel='일반소설';
+  function renderPubCats(){
+    const c=document.getElementById('pub-cats'); if(!c) return; c.innerHTML='';
+    PUB_CATS.forEach(cat=>{ const b=document.createElement('button'); b.type='button'; b.className=(cat===pubSel?'on':''); b.textContent=cat;
+      b.onclick=()=>{ pubSel=cat; renderPubCats(); }; c.appendChild(b); });
+  }
+  function setPubLive(pw){
+    const live=document.getElementById('pub-live'), pubBtn=document.getElementById('pub-publish'),
+          warn=document.getElementById('pub-warn'), urlIn=document.getElementById('pub-url');
+    if(pw && pw.is_active){ live.hidden=false; pubBtn.hidden=true; if(warn) warn.hidden=true; urlIn.value=shareOrigin()+'?work='+encodeURIComponent(pw.slug); }
+    else { live.hidden=true; pubBtn.hidden=false; if(warn) warn.hidden=false; }
+  }
+  function openPublishModal(d){
+    if(!pubModal) return;
+    pubDoc=d; const pw=pubByDoc[d.id]; pubSel=(pw&&pw.category)||'일반소설';
+    document.getElementById('pub-sub').textContent=d.title||'제목 없음';
+    renderPubCats(); setPubLive(pw); pubModal.hidden=false;
+  }
+  function closePublishModal(){ if(pubModal) pubModal.hidden=true; pubDoc=null; }
+  async function publishRpc(){ return sb.rpc('publish_work',{p_document_id:pubDoc.id, p_category:pubSel}); }
+  async function doPublishWork(){
+    if(!pubDoc) return;
+    const btn=document.getElementById('pub-publish'); btn.disabled=true; btn.textContent='공개하는 중…';
+    const {data,error}=await publishRpc();
+    btn.disabled=false; btn.textContent='공용 서재에 공개';
+    if(error){ alert('공개 실패: '+(error.message||error)); return; }
+    pubByDoc[pubDoc.id]={document_id:pubDoc.id, slug:data.slug, category:data.category, is_active:true};
+    setPubLive(pubByDoc[pubDoc.id]);
+  }
+  async function doRepublish(){
+    if(!pubDoc) return;
+    const btn=document.getElementById('pub-republish'); const old=btn.textContent; btn.disabled=true; btn.textContent='갱신 중…';
+    const {data,error}=await publishRpc(); btn.disabled=false;
+    if(error){ btn.textContent=old; alert('갱신 실패: '+(error.message||error)); return; }
+    pubByDoc[pubDoc.id]={document_id:pubDoc.id, slug:data.slug, category:data.category, is_active:true};
+    setPubLive(pubByDoc[pubDoc.id]); btn.textContent='갱신됨'; setTimeout(()=>{ btn.textContent=old; },1400);
+  }
+  async function doUnpublishWork(){
+    if(!pubDoc) return;
+    if(!window.confirm('공용 서재에서 내릴까요?\n링크와 검색에서 더 이상 보이지 않게 됩니다(다시 공개할 수 있어요).')) return;
+    const {error}=await sb.from('public_works').update({is_active:false}).eq('document_id',pubDoc.id);
+    if(error){ alert('내리기 실패: '+(error.message||error)); return; }
+    if(pubByDoc[pubDoc.id]) pubByDoc[pubDoc.id].is_active=false;
+    setPubLive(pubByDoc[pubDoc.id]);
+  }
+  if(pubModal){
+    document.getElementById('pub-close').onclick=closePublishModal;
+    pubModal.addEventListener('click',e=>{ if(e.target===pubModal) closePublishModal(); });
+    document.getElementById('pub-publish').onclick=doPublishWork;
+    document.getElementById('pub-republish').onclick=doRepublish;
+    document.getElementById('pub-unpublish').onclick=doUnpublishWork;
+    const cp=document.getElementById('pub-copy');
+    cp.onclick=async()=>{ const u=document.getElementById('pub-url').value; try{ await navigator.clipboard.writeText(u); cp.textContent='복사됨'; setTimeout(()=>cp.textContent='복사',1400); }catch(_){ const i=document.getElementById('pub-url'); i.select(); try{ document.execCommand('copy'); }catch(__){} } };
+  }
+  document.querySelectorAll('.side-link').forEach(b=>{ b.onclick=()=>{ if(b.dataset.view==='lib') showLib(); else if(b.dataset.view==='shares') showShares(); else if(b.dataset.page==='public') showPublic(); else showPage(b.dataset.page); }; });
   const wmHome=document.querySelector('.wordmark');
   if(wmHome) wmHome.onclick=()=>{ if(document.body.classList.contains('doc-open') && !window.confirm('문서를 닫고 나의 서재로 돌아가시겠습니까?')) return; if(authed){ showDashboard(); showLib(); } else if(V.resetHome) V.resetHome(); };
   function renderPager(pages){ pagerEl.innerHTML=''; if(pages<=1) return;
@@ -2702,6 +2894,52 @@ function assemble(md){
     fillGate(data);
     const saved=getCookie();
     if(saved) doEnter(saved); else showGate();
+  })();
+})();
+</script>
+
+<script>
+/* ===================================================================
+   미리봄 — 공용 서재 공개 읽기 (?work=slug)
+   가입·이름 없이 누구나 읽는 공개본. noindex 하지 않음(검색 노출 대상).
+   기존 리더(window.__MV.loadManuscript)를 재사용한다.
+   =================================================================== */
+(function(){
+  const slug=new URLSearchParams(location.search).get('work');
+  if(!slug) return;   // 일반 앱/공유 모드 — 아무것도 하지 않음
+
+  document.body.classList.add('public-mode');
+  const $=s=>document.querySelector(s);
+  const V=window.__MV||{};
+  const cfg=window.MIRIBOM_CONFIG, sbLib=window.supabase;
+  const loading=$('#loading'), expired=$('#share-expired');
+
+  function showLoading(msg){ if(!loading) return; const l=loading.querySelector('.lmsg'); if(l) l.textContent=msg||'잠시만요…'; loading.hidden=false; }
+  function hideLoading(){ if(loading) loading.hidden=true; }
+  function showNotFound(){
+    if(!expired) return;
+    const t=expired.querySelector('.share-screen-title'), f=expired.querySelector('.share-screen-foot');
+    if(t) t.textContent='찾을 수 없는 공개본입니다';
+    if(f) f.textContent='주소가 바뀌었거나, 작가가 공개를 내렸을 수 있어요.';
+    expired.classList.add('show');
+  }
+
+  // 워드마크 → 앱 홈(나의 서재/랜딩)으로
+  const wm=document.querySelector('.wordmark'); if(wm){ wm.style.cursor='pointer'; wm.onclick=()=>{ location.href=location.pathname; }; }
+
+  if(!(sbLib && cfg && cfg.SUPABASE_URL && cfg.SUPABASE_ANON_KEY)){ showNotFound(); return; }
+  const sb=sbLib.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY, {auth:{persistSession:false}});
+
+  (async function(){
+    showLoading('원고를 펼치는 중…');
+    const {data,error}=await sb.from('public_works')
+      .select('title,content_md,cover_path').eq('slug',slug).eq('is_active',true).maybeSingle();
+    hideLoading();
+    if(error || !data){ showNotFound(); return; }
+    if(V.loadManuscript){
+      const cu=data.cover_path ? sb.storage.from('covers').getPublicUrl(data.cover_path).data.publicUrl : '';
+      V.loadManuscript(data.content_md||'', cu, data.title||'');
+    } else showNotFound();
   })();
 })();
 </script>
