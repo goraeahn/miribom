@@ -83,9 +83,43 @@ async function main() {
       check('A는 자기 공유 접속로그를 읽을 수 있다(양성 대조)', !aEvErr && Array.isArray(aEvents));
     }
 
+    // ── 공용 서재 공개본 격리 (② 회귀) ─────────────────────────────
+    console.log('\n[public_works 격리]');
+    let workId = null;
+    const { data: pub, error: pubErr } = await A.c.rpc('publish_work', {
+      p_document_id: docA.id, p_category: '안내서·실용',
+    });
+    check('A가 자기 원고를 공개한다(양성 대조)', !pubErr && !!pub?.slug);
+    if (pubErr) console.error('   publish 오류:', pubErr.message);
+
+    if (pub?.slug) {
+      const { data: bySlug } = await anon.from('public_works')
+        .select('id,title,content_md').eq('slug', pub.slug);
+      check('비로그인 방문자가 활성 공개본을 읽는다', (bySlug?.length || 0) === 1 && bySlug[0].content_md === 'SECRET-A');
+      workId = bySlug?.[0]?.id || null;
+
+      const { error: bPubErr } = await B.c.rpc('publish_work', { p_document_id: docA.id, p_category: '동화' });
+      check('B는 A의 원고를 공개하지 못한다(거부)', !!bPubErr);
+
+      const { data: anonIns, error: anonInsErr } = await anon.from('public_works')
+        .insert({ document_id: docA.id, owner_id: A.uid, slug: 'hack-' + Date.now(), title: 'x', content_md: 'x', category: '동화' }).select();
+      check('비로그인은 공개본을 직접 만들지 못한다', !!anonInsErr || (anonIns?.length || 0) === 0);
+
+      if (workId) {
+        await B.c.from('public_works').delete().eq('id', workId);
+        const { data: still } = await anon.from('public_works').select('id').eq('id', workId);
+        check('B는 남의 공개본을 삭제하지 못한다(여전히 보임)', (still?.length || 0) === 1);
+      }
+    }
+
     // 정리
     await A.c.from('documents').delete().eq('id', docA.id);
-    console.log('\n🧹 테스트 원고 삭제(공유는 cascade로 함께 정리)');
+    console.log('\n🧹 테스트 원고 삭제(공유·공개본은 cascade로 함께 정리)');
+
+    if (workId) {
+      const { data: gone } = await anon.from('public_works').select('id').eq('id', workId);
+      check('원본 원고 삭제 시 공개본도 사라진다(cascade)', (gone?.length || 0) === 0);
+    }
   }
 
   console.log(`\n━━━ 결과: ${pass} PASS / ${fail} FAIL ━━━`);
