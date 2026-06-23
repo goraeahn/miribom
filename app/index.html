@@ -2619,12 +2619,15 @@ function assemble(md){
   nameIn.addEventListener('keydown',e=>{ if(e.key==='Enter' && nameIn.value.trim()) doEnter(nameIn.value.trim()); });
   startBtn.onclick=()=>{ const n=nameIn.value.trim(); if(n) doEnter(n); };
 
+  let entering=false;
   async function doEnter(name){
+    if(entering) return;            // 버튼·Enter 이중 호출(연타) 방지 — 접속 로그 중복 차단
+    entering=true;
     startBtn.disabled=true;
     gate.classList.remove('show');
     showLoading('원고를 펼치는 중…');
     const {data,error}=await sb.rpc('share_enter',{p_token:token,p_viewer_name:name});
-    if(error || !data || !data.ok){ hideLoading(); showExpired(); return; }
+    if(error || !data || !data.ok){ entering=false; hideLoading(); showExpired(); return; }
     setCookie(name);
     hideLoading();
     if(V.loadManuscript){ const _cu=data.cover_path?sb.storage.from('covers').getPublicUrl(data.cover_path).data.publicUrl:''; V.loadManuscript(data.content_md||'', _cu, data.title||''); } else showExpired();
