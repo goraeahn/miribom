@@ -483,6 +483,7 @@
   .pub-revoke{flex:1;padding:10px;font-size:13px;font-family:inherit;color:#c0392b;background:none;border:1px solid color-mix(in srgb,#c0392b 35%,transparent);border-radius:10px;cursor:pointer;transition:background .15s,color .15s}
   .pub-revoke:hover{background:#c0392b;color:#fff;border-color:#c0392b}
   .pub-help{margin:10px 0 0;font-size:12px;color:var(--muted);line-height:1.55}
+  .pub-done-msg{margin:6px 0 18px;font-size:15px;line-height:1.7;color:var(--ink);text-align:center}
   /* ① 인라인 편집기 (독립 모듈) — 레이어 팝업(딤+모달), 좌:본문 / 우:책정보 */
   .editor-ov{position:fixed;inset:0;z-index:70;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(18,17,22,.46);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);box-sizing:border-box}
   body.editing{overflow:hidden}
@@ -781,10 +782,10 @@
 <div class="modal-bg" id="publish-modal" hidden>
   <div class="pub-card">
     <button class="modal-x" id="pub-close" aria-label="닫기">×</button>
-    <h3 class="pub-h">공용 서재에 공개</h3>
+    <h3 class="pub-h" id="pub-h">공용 서재에 공개</h3>
     <p class="pub-sub" id="pub-sub">제목</p>
 
-    <div class="pub-field">
+    <div class="pub-field" id="pub-field">
       <span class="pub-label">분류</span>
       <div class="pub-cats" id="pub-cats"></div>
     </div>
@@ -802,6 +803,11 @@
         <button class="pub-revoke" id="pub-unpublish" type="button">공용 서재에서 내리기</button>
       </div>
       <p class="pub-help">원본을 고쳐도 공개본은 그대로예요. ‘공개본 갱신’을 누르면 지금 내용·표지로 다시 굳힙니다. 분류를 바꾼 뒤 갱신하면 분류도 바뀝니다.</p>
+    </div>
+
+    <div id="pub-done" hidden>
+      <p class="pub-done-msg">공개되었습니다.<br>공용 서재에서 확인하실 수 있어요.</p>
+      <button class="pub-primary" id="pub-done-close" type="button">닫기</button>
     </div>
 
     <p class="pub-help" id="pub-warn">공개하면 누구나 가입 없이 읽을 수 있고 검색에 노출될 수 있어요. 언제든 내릴 수 있습니다.</p>
@@ -2530,17 +2536,30 @@ function assemble(md){
     PUB_CATS.forEach(cat=>{ const b=document.createElement('button'); b.type='button'; b.className=(cat===pubSel?'on':''); b.textContent=cat;
       b.onclick=()=>{ pubSel=cat; renderPubCats(); }; c.appendChild(b); });
   }
-  function setPubLive(pw){
-    const live=document.getElementById('pub-live'), pubBtn=document.getElementById('pub-publish'),
-          warn=document.getElementById('pub-warn'), urlIn=document.getElementById('pub-url');
-    if(pw && pw.is_active){ live.hidden=false; pubBtn.hidden=true; if(warn) warn.hidden=true; urlIn.value=shareOrigin()+'?work='+encodeURIComponent(pw.slug); }
-    else { live.hidden=true; pubBtn.hidden=false; if(warn) warn.hidden=false; }
+  // 모달 3상태: 'publish'(아직 공개 전) / 'manage'(이미 공개됨, 다시 누름) / 'done'(방금 공개함)
+  function setPubState(state, pw){
+    const field=document.getElementById('pub-field'), pubBtn=document.getElementById('pub-publish'),
+          live=document.getElementById('pub-live'), done=document.getElementById('pub-done'),
+          warn=document.getElementById('pub-warn'), h=document.getElementById('pub-h'),
+          urlIn=document.getElementById('pub-url');
+    const show=(el,on)=>{ if(el) el.hidden=!on; };
+    if(state==='manage'){
+      if(h) h.textContent='공개 관리';
+      show(field,true); show(pubBtn,false); show(live,true); show(done,false); show(warn,false);
+      if(pw && urlIn) urlIn.value=shareOrigin()+'?work='+encodeURIComponent(pw.slug);
+    } else if(state==='done'){
+      if(h) h.textContent='공개 완료';
+      show(field,false); show(pubBtn,false); show(live,false); show(done,true); show(warn,false);
+    } else { // publish
+      if(h) h.textContent='공용 서재에 공개';
+      show(field,true); show(pubBtn,true); show(live,false); show(done,false); show(warn,true);
+    }
   }
   function openPublishModal(d){
     if(!pubModal) return;
     pubDoc=d; const pw=pubByDoc[d.id]; pubSel=(pw&&pw.category)||'일반소설';
     document.getElementById('pub-sub').textContent=d.title||'제목 없음';
-    renderPubCats(); setPubLive(pw); pubModal.hidden=false;
+    renderPubCats(); setPubState(pw&&pw.is_active?'manage':'publish', pw); pubModal.hidden=false;
   }
   function closePublishModal(){ if(pubModal) pubModal.hidden=true; pubDoc=null; }
   async function publishRpc(){ return sb.rpc('publish_work',{p_document_id:pubDoc.id, p_category:pubSel}); }
@@ -2551,7 +2570,7 @@ function assemble(md){
     btn.disabled=false; btn.textContent='공용 서재에 공개';
     if(error){ alert('공개 실패: '+(error.message||error)); return; }
     pubByDoc[pubDoc.id]={document_id:pubDoc.id, slug:data.slug, category:data.category, is_active:true};
-    setPubLive(pubByDoc[pubDoc.id]);
+    setPubState('done');   // 공개 직후엔 안내 + 닫기만
   }
   async function doRepublish(){
     if(!pubDoc) return;
@@ -2559,7 +2578,7 @@ function assemble(md){
     const {data,error}=await publishRpc(); btn.disabled=false;
     if(error){ btn.textContent=old; alert('갱신 실패: '+(error.message||error)); return; }
     pubByDoc[pubDoc.id]={document_id:pubDoc.id, slug:data.slug, category:data.category, is_active:true};
-    setPubLive(pubByDoc[pubDoc.id]); btn.textContent='갱신됨'; setTimeout(()=>{ btn.textContent=old; },1400);
+    btn.textContent='갱신됨'; setTimeout(()=>{ btn.textContent=old; },1400);
   }
   async function doUnpublishWork(){
     if(!pubDoc) return;
@@ -2567,10 +2586,11 @@ function assemble(md){
     const {error}=await sb.from('public_works').update({is_active:false}).eq('document_id',pubDoc.id);
     if(error){ alert('내리기 실패: '+(error.message||error)); return; }
     if(pubByDoc[pubDoc.id]) pubByDoc[pubDoc.id].is_active=false;
-    setPubLive(pubByDoc[pubDoc.id]);
+    setPubState('publish');   // 내린 뒤엔 다시 공개할 수 있는 화면으로
   }
   if(pubModal){
     document.getElementById('pub-close').onclick=closePublishModal;
+    document.getElementById('pub-done-close').onclick=closePublishModal;
     pubModal.addEventListener('click',e=>{ if(e.target===pubModal) closePublishModal(); });
     document.getElementById('pub-publish').onclick=doPublishWork;
     document.getElementById('pub-republish').onclick=doRepublish;
