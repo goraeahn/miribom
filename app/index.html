@@ -454,14 +454,25 @@
   .ed-body{flex:1;min-height:0;display:flex}
   .ed-left{flex:1;min-width:0;display:flex;flex-direction:column;gap:10px;padding:18px 18px 14px;box-sizing:border-box}
   .ed-right{flex:0 0 350px;width:350px;display:flex;flex-direction:column;gap:11px;padding:18px 18px 14px;overflow-y:auto;border-left:1px solid color-mix(in srgb,var(--ink) 10%,transparent);background:color-mix(in srgb,var(--ink) 2.5%,transparent);box-sizing:border-box}
-  .ed-col-title{margin:0;font-size:13px;font-weight:700;color:var(--ink);letter-spacing:.01em}
-  .ed-text{flex:1;min-height:0;font-family:var(--ui);font-size:15px;line-height:1.75;color:var(--ink);padding:14px;border:1px solid color-mix(in srgb,var(--ink) 13%,transparent);border-radius:11px;background:var(--sheet,#fff);resize:none;width:100%;box-sizing:border-box;overflow:auto}
+  .ed-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .ed-col-title{margin:0;font-size:17px;font-weight:700;color:var(--ink);letter-spacing:.01em}
+  .ed-col-sub{font-size:12.5px;font-weight:400;color:var(--muted)}
+  .ed-text{flex:1;min-height:0;font-family:var(--ui);font-size:15px;line-height:1.75;color:var(--ink);padding:13px;border:1px solid color-mix(in srgb,var(--ink) 13%,transparent);border-radius:6px;background:var(--sheet,#fff);resize:none;width:100%;box-sizing:border-box;overflow:auto}
+  .ed-count{flex:0 0 auto;font-size:12px;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
   .ed-f,.ed-cover-row{display:flex;align-items:center;gap:9px;font-size:13px}
   .ed-f>span,.ed-cover-row>span{flex:0 0 52px;text-align:right;color:var(--muted)}
-  .ed-f input{flex:1;min-width:0;font:inherit;font-size:14px;color:var(--ink);padding:8px 10px;border:1px solid color-mix(in srgb,var(--ink) 15%,transparent);border-radius:8px;background:var(--sheet,#fff)}
-  .ed-cover{flex:1;min-width:0;font:inherit;font-size:13px;text-align:left;padding:8px 10px;border-radius:8px;border:1px solid color-mix(in srgb,var(--ink) 18%,transparent);background:none;color:var(--ink);cursor:pointer}
+  .ed-f input{flex:1;min-width:0;font:inherit;font-size:14px;color:var(--ink);padding:8px 10px;border:1px solid color-mix(in srgb,var(--ink) 15%,transparent);border-radius:5px;background:var(--sheet,#fff)}
+  .ed-cover{flex:1;min-width:0;font:inherit;font-size:13px;text-align:left;padding:8px 10px;border-radius:5px;border:1px solid color-mix(in srgb,var(--ink) 18%,transparent);background:none;color:var(--ink);cursor:pointer}
   .ed-cover:hover{background:color-mix(in srgb,var(--ink) 5%,transparent)}
   .ed-cover-hint{margin:-4px 0 0 61px;font-size:11.5px;color:var(--muted)}
+  /* 포커스: 두꺼운 검정 아웃라인 제거 → 은은한 강조색 링 */
+  .ed-text:focus,.ed-f input:focus,.ed-cover:focus-visible{outline:none;border-color:var(--accent,#5651B8);box-shadow:0 0 0 2px color-mix(in srgb,var(--accent,#5651B8) 20%,transparent)}
+  /* 스크롤바: 얇고 은은하게 */
+  .ed-text,.ed-right{scrollbar-width:thin;scrollbar-color:color-mix(in srgb,var(--ink) 22%,transparent) transparent}
+  .ed-text::-webkit-scrollbar,.ed-right::-webkit-scrollbar{width:10px;height:10px}
+  .ed-text::-webkit-scrollbar-track,.ed-right::-webkit-scrollbar-track{background:transparent}
+  .ed-text::-webkit-scrollbar-thumb,.ed-right::-webkit-scrollbar-thumb{background:color-mix(in srgb,var(--ink) 20%,transparent);border-radius:8px;border:2px solid transparent;background-clip:padding-box}
+  .ed-text::-webkit-scrollbar-thumb:hover,.ed-right::-webkit-scrollbar-thumb:hover{background:color-mix(in srgb,var(--ink) 34%,transparent);background-clip:padding-box}
   .ed-foot{flex:0 0 auto;display:flex;align-items:center;gap:8px;padding:11px 16px;border-top:1px solid color-mix(in srgb,var(--ink) 10%,transparent)}
   .ed-foot-sp{flex:1}
   .ed-status{font-size:12.5px;color:var(--muted);margin-right:4px}
@@ -2700,8 +2711,12 @@ function assemble(md){
   <div class="ed-modal" role="dialog" aria-modal="true" aria-label="원고 수정">
     <div class="ed-body">
       <div class="ed-left">
-        <h2 class="ed-col-title">마크다운 수정하기</h2>
+        <div class="ed-head">
+          <h2 class="ed-col-title">마크다운 수정하기</h2>
+          <span class="ed-col-sub">미리봄에서 간단한 마크다운 수정을 지원합니다.</span>
+        </div>
         <textarea class="ed-text" id="ed-text" placeholder="본문을 여기서 고칠 수 있어요…" spellcheck="false"></textarea>
+        <div class="ed-count" id="ed-count">행 1 · 0자 · 0.0매</div>
       </div>
       <div class="ed-right">
         <h2 class="ed-col-title">책 정보</h2>
@@ -2734,7 +2749,7 @@ function assemble(md){
   const fEls={ title:$('#ed-title'), subtitle:$('#ed-subtitle'), author:$('#ed-author'),
     publisher:$('#ed-publisher'), date:$('#ed-date'), identifier:$('#ed-identifier'), rights:$('#ed-rights') };
   const bodyEl=$('#ed-text'), statusEl=$('#ed-status'), saveBtn=$('#ed-save'),
-    resetBtn=$('#ed-reset'), discardBtn=$('#ed-discard'), coverBtn=$('#ed-cover');
+    resetBtn=$('#ed-reset'), discardBtn=$('#ed-discard'), coverBtn=$('#ed-cover'), countEl=$('#ed-count');
   let cur=null, cb=null, meta0={}, saved=true, draftTimer=0;
   const DKEY=id=>'mrb_draft_'+id;
 
@@ -2744,6 +2759,9 @@ function assemble(md){
   function scheduleDraft(){ clearTimeout(draftTimer); draftTimer=setTimeout(()=>{ if(cur){ try{ localStorage.setItem(DKEY(cur.id), JSON.stringify({md:buildMd()})); }catch(_){ } } }, 1500); }
   function markDirty(){ saved=false; setStatus(true); scheduleDraft(); }
   function fillFrom(md){ const r=parseYAML(md||''); meta0={...r.meta}; for(const k in fEls){ fEls[k].value=r.meta[k]||''; } bodyEl.value=(r.rest||'').replace(/^\n+/,''); }
+  function updateCount(){ if(!countEl) return; const v=bodyEl.value, chars=v.length,
+    line=v.slice(0, bodyEl.selectionStart||0).split('\n').length;
+    countEl.textContent='행 '+line+' · '+chars.toLocaleString()+'자 · '+(chars/200).toFixed(1)+'매'; }
 
   function open(doc, callbacks){
     cur=doc; cb=callbacks||{}; saved=true;
@@ -2753,7 +2771,7 @@ function assemble(md){
     } else { fillFrom(doc.content_md||''); try{ localStorage.removeItem(DKEY(doc.id)); }catch(_){ } }
     setStatus(!saved);
     document.body.classList.add('editing');
-    ov.hidden=false; setTimeout(()=>{ try{ bodyEl.focus(); }catch(_){ } }, 50);
+    ov.hidden=false; bodyEl.scrollTop=0; updateCount();
   }
 
   async function doSave(){
@@ -2772,7 +2790,7 @@ function assemble(md){
   function resetToSaved(){
     if(!cur) return;
     if(!saved && !window.confirm('지금까지 고친 내용을 버리고 마지막 저장 상태로 되돌릴까요?')) return;
-    fillFrom(cur.content_md||''); saved=true; setStatus(false);
+    fillFrom(cur.content_md||''); saved=true; setStatus(false); bodyEl.scrollTop=0; updateCount();
     try{ localStorage.removeItem(DKEY(cur.id)); }catch(_){ }
   }
 
@@ -2787,6 +2805,7 @@ function assemble(md){
 
   Object.values(fEls).forEach(el=>el.addEventListener('input',markDirty));
   bodyEl.addEventListener('input',markDirty);
+  ['input','keyup','click'].forEach(ev=>bodyEl.addEventListener(ev,updateCount));
   saveBtn.onclick=doSaveClose; resetBtn.onclick=resetToSaved; discardBtn.onclick=closeDiscard;
   if(coverBtn) coverBtn.onclick=()=>{ if(cb&&cb.pickCover) cb.pickCover(); };
   document.addEventListener('keydown',e=>{ if(!document.body.classList.contains('editing')) return;
