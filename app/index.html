@@ -447,30 +447,32 @@
   .shares-readers-list{display:block;margin-top:3px;font-size:12px;color:var(--muted)}
   .shares-readers-list .nm{opacity:.8}
   .shares-empty,.shares-loading{color:var(--muted);font-size:14px;padding:26px 0;text-align:center}
-  /* ① 인라인 편집기 (독립 모듈) */
-  .editor-ov{position:fixed;inset:0;z-index:70;background:var(--bg,#faf7f2);display:flex;flex-direction:column;color:var(--ink)}
-  body.editing-preview .editor-ov{display:none}
-  body.editing #dashboard{display:none}
-  .ed-bar{display:flex;align-items:center;gap:8px;padding:11px 16px;border-bottom:1px solid color-mix(in srgb,var(--ink) 10%,transparent)}
-  .ed-status{font-size:13px;color:var(--muted)}
+  /* ① 인라인 편집기 (독립 모듈) — 레이어 팝업(딤+모달), 좌:본문 / 우:책정보 */
+  .editor-ov{position:fixed;inset:0;z-index:70;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(18,17,22,.46);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);box-sizing:border-box}
+  body.editing{overflow:hidden}
+  .ed-modal{width:min(1080px,94vw);height:min(760px,92vh);display:flex;flex-direction:column;background:var(--bg,#faf7f2);color:var(--ink);border:1px solid color-mix(in srgb,var(--ink) 12%,transparent);border-radius:16px;box-shadow:0 30px 80px -24px rgba(0,0,0,.55);overflow:hidden;box-sizing:border-box}
+  .ed-body{flex:1;min-height:0;display:flex}
+  .ed-left{flex:1;min-width:0;display:flex;flex-direction:column;gap:10px;padding:18px 18px 14px;box-sizing:border-box}
+  .ed-right{flex:0 0 350px;width:350px;display:flex;flex-direction:column;gap:11px;padding:18px 18px 14px;overflow-y:auto;border-left:1px solid color-mix(in srgb,var(--ink) 10%,transparent);background:color-mix(in srgb,var(--ink) 2.5%,transparent);box-sizing:border-box}
+  .ed-col-title{margin:0;font-size:13px;font-weight:700;color:var(--ink);letter-spacing:.01em}
+  .ed-text{flex:1;min-height:0;font-family:var(--ui);font-size:15px;line-height:1.75;color:var(--ink);padding:14px;border:1px solid color-mix(in srgb,var(--ink) 13%,transparent);border-radius:11px;background:var(--sheet,#fff);resize:none;width:100%;box-sizing:border-box;overflow:auto}
+  .ed-f,.ed-cover-row{display:flex;align-items:center;gap:9px;font-size:13px}
+  .ed-f>span,.ed-cover-row>span{flex:0 0 52px;text-align:right;color:var(--muted)}
+  .ed-f input{flex:1;min-width:0;font:inherit;font-size:14px;color:var(--ink);padding:8px 10px;border:1px solid color-mix(in srgb,var(--ink) 15%,transparent);border-radius:8px;background:var(--sheet,#fff)}
+  .ed-cover{flex:1;min-width:0;font:inherit;font-size:13px;text-align:left;padding:8px 10px;border-radius:8px;border:1px solid color-mix(in srgb,var(--ink) 18%,transparent);background:none;color:var(--ink);cursor:pointer}
+  .ed-cover:hover{background:color-mix(in srgb,var(--ink) 5%,transparent)}
+  .ed-cover-hint{margin:-4px 0 0 61px;font-size:11.5px;color:var(--muted)}
+  .ed-foot{flex:0 0 auto;display:flex;align-items:center;gap:8px;padding:11px 16px;border-top:1px solid color-mix(in srgb,var(--ink) 10%,transparent)}
+  .ed-foot-sp{flex:1}
+  .ed-status{font-size:12.5px;color:var(--muted);margin-right:4px}
   .ed-status.dirty{color:#b8742a}
-  .ed-bar-sp{flex:1}
-  .ed-btn{font:inherit;font-size:14px;padding:7px 14px;border-radius:9px;border:1px solid color-mix(in srgb,var(--ink) 18%,transparent);background:none;color:var(--ink);cursor:pointer;transition:background .14s}
+  .ed-btn{font:inherit;font-size:14px;padding:8px 15px;border-radius:9px;border:1px solid color-mix(in srgb,var(--ink) 18%,transparent);background:none;color:var(--ink);cursor:pointer;transition:background .14s}
   .ed-btn:hover{background:color-mix(in srgb,var(--ink) 6%,transparent)}
+  .ed-btn.ed-ghost{color:var(--muted)}
   .ed-btn.ed-save{background:var(--accent,#5651B8);color:#fff;border-color:transparent}
   .ed-btn.ed-save:hover{filter:brightness(1.06);background:var(--accent,#5651B8)}
-  .ed-main{flex:1;min-height:0;display:flex;flex-direction:column;overflow:auto;padding:18px 16px;max-width:760px;width:100%;margin:0 auto;gap:14px;box-sizing:border-box}
-  .ed-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  .ed-f{display:flex;flex-direction:column;font-size:12px;color:var(--muted);gap:4px}
-  .ed-f-wide{grid-column:1 / -1}
-  .ed-f input{font:inherit;font-size:15px;color:var(--ink);padding:9px 11px;border:1px solid color-mix(in srgb,var(--ink) 15%,transparent);border-radius:9px;background:var(--sheet,#fff)}
-  .ed-cover-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-  .ed-cover{font:inherit;font-size:13px;padding:8px 13px;border-radius:9px;border:1px solid color-mix(in srgb,var(--ink) 18%,transparent);background:none;color:var(--ink);cursor:pointer}
-  .ed-cover-hint{font-size:12px;color:var(--muted)}
-  .ed-text{flex:1;min-height:300px;font-family:var(--ui);font-size:15px;line-height:1.7;color:var(--ink);padding:14px;border:1px solid color-mix(in srgb,var(--ink) 13%,transparent);border-radius:11px;background:var(--sheet,#fff);resize:none;width:100%;box-sizing:border-box}
-  .ed-back{position:fixed;left:16px;top:13px;z-index:71;align-items:center;font:inherit;font-size:14px;padding:8px 14px;border-radius:9px;border:1px solid color-mix(in srgb,var(--ink) 18%,transparent);background:var(--bg,#faf7f2);color:var(--ink);cursor:pointer;display:none}
-  body.editing-preview .ed-back{display:inline-flex}
-  @media(max-width:560px){ .ed-grid{grid-template-columns:1fr} }
+  .ed-btn:disabled{opacity:.55;cursor:default}
+  @media(max-width:760px){ .ov-edit{display:none!important} }
   .share-names{margin:9px 0 0;font-size:12.5px;color:var(--s-text);line-height:1.7}
   .share-names .nm{color:var(--s-muted)}
   .share-empty{font-size:12.5px;color:var(--s-muted);padding:2px 0 4px}
@@ -2269,7 +2271,7 @@ function assemble(md){
       const ov=document.createElement('div'); ov.className='card-ov';
       const ovBtn=(label,svg,fn,danger,full)=>{ const b=document.createElement('button'); b.type='button'; b.className='ov-btn'+(danger?' danger':'')+(full?' full':''); b.innerHTML=svg+'<span>'+label+'</span>'; b.addEventListener('click',ev=>{ ev.stopPropagation(); fn(); }); return b; };
       ov.appendChild(ovBtn('뷰어',VIEW_ICON,()=>openDoc(d)));
-      ov.appendChild(ovBtn('수정','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>',()=>openEditor(d)));
+      const edBtn=ovBtn('수정','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>',()=>openEditor(d)); edBtn.classList.add('ov-edit'); ov.appendChild(edBtn);
       ov.appendChild(ovBtn(d.cover_thumb_path?'표지 교체':'표지',IMG_ICON,()=>onSetCover(d)));
       ov.appendChild(ovBtn('공유',SHARE_ICON,()=>openShareModal(d)));
       ov.appendChild(ovBtn('삭제',TRASH_ICON,()=>onDelete(d),true));
@@ -2390,7 +2392,7 @@ function assemble(md){
     window.__EDITOR.open(d, {
       save: async (md, title)=>{ const {error}=await sb.from('documents').update({content_md:md, title:title, updated_at:new Date().toISOString()}).eq('id',d.id); if(error) throw error; await loadDocs(); },
       pickCover: ()=>onSetCover(d),
-      onClosed: ()=>{ showDashboard(); showLib(); }
+      onClosed: ()=>{}
     });
   }
   async function onDelete(d){
@@ -2695,30 +2697,33 @@ function assemble(md){
 
 <!-- ① 인라인 편집기 (독립 모듈 — 추후 editor.js로 분리 가능) -->
 <div class="editor-ov" id="editor-overlay" hidden>
-  <div class="ed-bar">
-    <span class="ed-status" id="ed-status">저장됨</span>
-    <span class="ed-bar-sp"></span>
-    <button class="ed-btn" id="ed-preview-btn" type="button">미리보기</button>
-    <button class="ed-btn ed-save" id="ed-save" type="button">저장</button>
-    <button class="ed-btn" id="ed-close" type="button">닫기</button>
-  </div>
-  <div class="ed-main">
-    <div class="ed-grid">
-      <label class="ed-f">제목<input id="ed-title" type="text" autocomplete="off"></label>
-      <label class="ed-f">부제<input id="ed-subtitle" type="text" autocomplete="off"></label>
-      <label class="ed-f">저자<input id="ed-author" type="text" autocomplete="off"></label>
-      <label class="ed-f">출판사<input id="ed-publisher" type="text" autocomplete="off"></label>
-      <label class="ed-f">발행일<input id="ed-date" type="text" placeholder="2026-01-01" autocomplete="off"></label>
-      <label class="ed-f">식별자<input id="ed-identifier" type="text" autocomplete="off"></label>
-      <label class="ed-f ed-f-wide">판권<input id="ed-rights" type="text" autocomplete="off"></label>
+  <div class="ed-modal" role="dialog" aria-modal="true" aria-label="원고 수정">
+    <div class="ed-body">
+      <div class="ed-left">
+        <h2 class="ed-col-title">마크다운 수정하기</h2>
+        <textarea class="ed-text" id="ed-text" placeholder="본문을 여기서 고칠 수 있어요…" spellcheck="false"></textarea>
+      </div>
+      <div class="ed-right">
+        <h2 class="ed-col-title">책 정보</h2>
+        <label class="ed-f"><span>제목</span><input id="ed-title" type="text" autocomplete="off"></label>
+        <label class="ed-f"><span>부제</span><input id="ed-subtitle" type="text" autocomplete="off"></label>
+        <label class="ed-f"><span>저자</span><input id="ed-author" type="text" autocomplete="off"></label>
+        <label class="ed-f"><span>출판사</span><input id="ed-publisher" type="text" autocomplete="off"></label>
+        <label class="ed-f"><span>발행일</span><input id="ed-date" type="text" placeholder="2026-01-01" autocomplete="off"></label>
+        <label class="ed-f"><span>식별자</span><input id="ed-identifier" type="text" autocomplete="off"></label>
+        <label class="ed-f"><span>판권</span><input id="ed-rights" type="text" autocomplete="off"></label>
+        <div class="ed-cover-row"><span>표지</span><button class="ed-cover" id="ed-cover" type="button">이미지 고르기…</button></div>
+        <div class="ed-cover-hint">고르면 바로 적용됩니다 (본문 저장과 별개)</div>
+      </div>
     </div>
-    <div class="ed-cover-row">
-      <button class="ed-cover" id="ed-cover" type="button">표지 이미지…</button>
-      <span class="ed-cover-hint">표지는 바로 저장됩니다(본문 저장과 별개)</span>
+    <div class="ed-foot">
+      <button class="ed-btn ed-ghost" id="ed-reset" type="button">초기화</button>
+      <button class="ed-btn ed-ghost" id="ed-discard" type="button">저장 없이 닫기</button>
+      <span class="ed-foot-sp"></span>
+      <span class="ed-status" id="ed-status">저장됨</span>
+      <button class="ed-btn ed-save" id="ed-save" type="button">저장</button>
     </div>
-    <textarea class="ed-text" id="ed-text" placeholder="본문을 여기서 고칠 수 있어요…" spellcheck="false"></textarea>
   </div>
-  <button class="ed-back" id="ed-back-btn" type="button">← 편집으로</button>
 </div>
 <script>
 /* ① 인라인 편집기 — 독립 IIFE. 바깥과는 parseYAML·serializeFront·window.__MV·콜백으로만 대화 */
@@ -2728,8 +2733,8 @@ function assemble(md){
   const ov=$('#editor-overlay'); if(!ov) return;
   const fEls={ title:$('#ed-title'), subtitle:$('#ed-subtitle'), author:$('#ed-author'),
     publisher:$('#ed-publisher'), date:$('#ed-date'), identifier:$('#ed-identifier'), rights:$('#ed-rights') };
-  const bodyEl=$('#ed-text'), statusEl=$('#ed-status'), saveBtn=$('#ed-save'), closeBtn=$('#ed-close'),
-    prevBtn=$('#ed-preview-btn'), backBtn=$('#ed-back-btn'), coverBtn=$('#ed-cover');
+  const bodyEl=$('#ed-text'), statusEl=$('#ed-status'), saveBtn=$('#ed-save'),
+    resetBtn=$('#ed-reset'), discardBtn=$('#ed-discard'), coverBtn=$('#ed-cover');
   let cur=null, cb=null, meta0={}, saved=true, draftTimer=0;
   const DKEY=id=>'mrb_draft_'+id;
 
@@ -2747,12 +2752,9 @@ function assemble(md){
       fillFrom(draft.md); saved=false;
     } else { fillFrom(doc.content_md||''); try{ localStorage.removeItem(DKEY(doc.id)); }catch(_){ } }
     setStatus(!saved);
-    document.body.classList.add('editing'); document.body.classList.remove('editing-preview');
-    ov.hidden=false; setTimeout(()=>{ try{ fEls.title.focus(); }catch(_){ } }, 50);
+    document.body.classList.add('editing');
+    ov.hidden=false; setTimeout(()=>{ try{ bodyEl.focus(); }catch(_){ } }, 50);
   }
-  function showPreview(){ document.body.classList.add('editing-preview');
-    if(window.__MV && window.__MV.loadManuscript){ const t=fEls.title.value.trim()||(cur&&cur.title)||''; window.__MV.loadManuscript(buildMd(), '', t); } }
-  function backToEdit(){ document.body.classList.remove('editing-preview'); }
 
   async function doSave(){
     if(!cur||!cb||!cb.save) return false;
@@ -2765,22 +2767,31 @@ function assemble(md){
     }catch(e){ alert('저장 실패: '+(e&&e.message||e)); return false; }
     finally{ saveBtn.disabled=false; saveBtn.textContent='저장'; }
   }
-  function finishClose(){ document.body.classList.remove('editing','editing-preview'); ov.hidden=true; const f=cb&&cb.onClosed; cur=null; cb=null; if(f) f(); }
-  function close(){
+  function doSaveClose(){ doSave().then(ok=>{ if(ok) finishClose(); }); }
+
+  function resetToSaved(){
+    if(!cur) return;
+    if(!saved && !window.confirm('지금까지 고친 내용을 버리고 마지막 저장 상태로 되돌릴까요?')) return;
+    fillFrom(cur.content_md||''); saved=true; setStatus(false);
+    try{ localStorage.removeItem(DKEY(cur.id)); }catch(_){ }
+  }
+
+  function finishClose(){ document.body.classList.remove('editing'); ov.hidden=true; const f=cb&&cb.onClosed; cur=null; cb=null; if(f) f(); }
+  function closeDiscard(){
     if(saved){ finishClose(); return; }
-    if(window.confirm('저장하지 않은 변경이 있어요. 저장하고 닫을까요?  (확인 = 저장 후 닫기)')){ doSave().then(ok=>{ if(ok) finishClose(); }); return; }
-    if(window.confirm('저장 없이 닫을까요?\n작업은 초안으로 보관돼 다음에 이어서 편집할 수 있어요.  (취소 = 계속 편집)')){ finishClose(); }
+    if(window.confirm('저장하지 않은 변경이 있어요. 저장 없이 닫을까요?  (취소 = 계속 편집)')){
+      if(cur){ try{ localStorage.removeItem(DKEY(cur.id)); }catch(_){ } }
+      finishClose();
+    }
   }
 
   Object.values(fEls).forEach(el=>el.addEventListener('input',markDirty));
   bodyEl.addEventListener('input',markDirty);
-  saveBtn.onclick=doSave; closeBtn.onclick=close;
-  if(prevBtn) prevBtn.onclick=showPreview;
-  if(backBtn) backBtn.onclick=backToEdit;
+  saveBtn.onclick=doSaveClose; resetBtn.onclick=resetToSaved; discardBtn.onclick=closeDiscard;
   if(coverBtn) coverBtn.onclick=()=>{ if(cb&&cb.pickCover) cb.pickCover(); };
   document.addEventListener('keydown',e=>{ if(!document.body.classList.contains('editing')) return;
     if((e.ctrlKey||e.metaKey)&&(e.key==='s'||e.key==='S')){ e.preventDefault(); doSave(); }
-    else if(e.key==='Escape' && !document.body.classList.contains('editing-preview')){ close(); } });
+    else if(e.key==='Escape'){ closeDiscard(); } });
 
   window.__EDITOR={ open, clearDrafts(){ try{ Object.keys(localStorage).forEach(k=>{ if(k.indexOf('mrb_draft_')===0) localStorage.removeItem(k); }); }catch(_){ } } };
 })();
