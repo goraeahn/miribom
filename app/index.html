@@ -1362,6 +1362,16 @@ function parseYAML(src){
   }
   return {meta, rest: lines.slice(i).join('\n')};
 }
+/* YAML 역직렬화 (편집기용) — 미지 키(lang·cover-image·커스텀) 보존, 값 있는 키만, 필요시 따옴표 */
+function serializeFront(meta){
+  const order=['title','subtitle','author','publisher','date','identifier','rights','lang'];
+  const all=Object.keys(meta||{});
+  const keys=[...order.filter(k=>all.includes(k)), ...all.filter(k=>!order.includes(k))]
+    .filter(k=>{ const v=meta[k]; return v!=null && String(v).trim()!==''; });
+  if(!keys.length) return '';
+  const q=v=>{ v=String(v); return (/^[\s'"]|\s$/.test(v)) ? JSON.stringify(v) : v; };
+  return '---\n'+keys.map(k=>k+': '+q(meta[k])).join('\n')+'\n---\n';
+}
 
 /* ===== 2) 코드펜스 보호하며 주석 제거 ===== */
 function stripCommentsOutsideFences(src){
@@ -1659,10 +1669,10 @@ function assemble(md){
   const railBtns=['#info-btn','#toc-btn','#display-btn'].map($);
 
   /* ===== 로드 (SEAM: 향후 토큰 fetch로 교체) ===== */
-  function loadManuscript(md, coverUrl, colorKey){
+  function loadManuscript(md, coverUrl, colorKey, opts){
+    opts=opts||{};
     const loading=$('#loading'), lmsg=loading.querySelector('.lmsg');
-    lmsg.textContent = md.length>120000 ? '큰 원고예요. 페이지를 나누는 중…' : '원고를 펼치는 중…';
-    loading.hidden=false;
+    if(!opts.quiet){ lmsg.textContent = md.length>120000 ? '큰 원고예요. 페이지를 나누는 중…' : '원고를 펼치는 중…'; loading.hidden=false; }
     requestAnimationFrame(()=>requestAnimationFrame(()=>{   // 스피너 페인트 보장 후 파싱
       try{
         const r=assemble(md);
@@ -1673,9 +1683,13 @@ function assemble(md){
         empty.classList.add('hidden'); book.hidden=false; progress.hidden=false; document.body.classList.remove('chrome-hidden');
         document.body.classList.add('doc-open'); bgStop();
         railBtns.forEach(b=>b.disabled=false);
-        STATE.coverUrl=coverUrl||''; STATE.colorKey=colorKey||''; STATE.page=0; buildFlow(); paginate(); render();
+        STATE.coverUrl=coverUrl||''; STATE.colorKey=colorKey||'';
+        if(!opts.quiet) STATE.page=0;
+        buildFlow(); paginate();
+        if(opts.quiet){ const p=(opts.page!=null?opts.page:STATE.page); STATE.page=Math.max(0,Math.min(p,STATE.pageCount-1)); }
+        render();
       }catch(e){ console.warn('load',e); }
-      finally{ loading.hidden=true; }
+      finally{ if(!opts.quiet) loading.hidden=true; }
     }));
   }
   function resetHome(){
