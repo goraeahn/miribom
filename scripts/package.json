@@ -1,0 +1,13 @@
+{
+  "name": "miribom-rls-test",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "미리봄 RLS 격리 자동 테스트 (비공개 원고가 새지 않는지 증명)",
+  "scripts": {
+    "test": "node rls-test.mjs"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2"
+  }
+}
