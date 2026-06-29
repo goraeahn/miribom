@@ -3074,5 +3074,18 @@ function assemble(md){
 })();
 </script>
 
+<script>
+/* 방문 카운터 — 페이지 로드마다 1건 기록(내 Supabase). 멈춤 방지(keep-alive) 겸용.
+   개인정보 최소: 경로(pathname)만, IP/UA/쿼리(공유토큰) 미기록. 테이블 없으면 조용히 무시. */
+(function(){
+  try{
+    var cfg=window.MIRIBOM_CONFIG, lib=window.supabase;
+    if(!cfg||!lib||!cfg.SUPABASE_URL) return;
+    lib.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY, {auth:{persistSession:false}})
+       .from('visits').insert({ path: location.pathname }).then(function(){}, function(){});
+  }catch(_){}
+})();
+</script>
+
 </body>
 </html>
