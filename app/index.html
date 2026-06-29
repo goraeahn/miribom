@@ -329,6 +329,7 @@
   .side-box{margin-top:6px;border:1px solid var(--line);border-radius:10px;padding:12px 13px;font-size:11.5px;line-height:1.7;color:var(--muted)}
   .side-box a{color:var(--muted);text-decoration:underline;text-underline-offset:2px}
   .side-box-contact{margin-top:5px}
+  .side-visits{margin:0 0 7px;font-size:12.5px;font-weight:700;color:var(--ink)}
   /* 콘텐츠 아티클 페이지 */
   .doc-page{font-family:var(--ui);color:var(--ink);font-size:15px;line-height:1.78;max-width:800px;padding-bottom:20px}
   .doc-page h1{font-family:var(--serif);font-size:clamp(23px,3.2vw,29px);font-weight:700;letter-spacing:.01em;margin:0 0 18px}
@@ -723,7 +724,7 @@
             <button class="side-link" type="button" data-page="guide">이용 안내</button>
             <button class="side-link" type="button" data-page="faq">자주 묻는 질문</button>
           </nav>
-          <div class="side-box">주식회사 코드넛 · <a href="https://codnut.com" target="_blank" rel="noopener noreferrer">codnut.com</a> · 미리봄 1.0<div class="side-box-contact">문의처 gorae@codnut.com</div></div>
+          <div class="side-box"><div class="side-visits" id="side-visits" hidden></div>주식회사 코드넛 · <a href="https://codnut.com" target="_blank" rel="noopener noreferrer">codnut.com</a> · 미리봄 1.0<div class="side-box-contact">문의처 gorae@codnut.com</div></div>
         </aside>
       </div>
     </div>
@@ -2242,7 +2243,14 @@ function assemble(md){
   /* ---------- 화면 전환 ---------- */
   const dash=$('#dashboard'), cardsEl=$('#cards'), pagerEl=$('#pager'),
         limitEl=$('#dash-limit'), dashEmpty=$('#dash-empty'), dropzone=$('#dash-dropzone');
-  function showDashboard(){ if(V.resetHome) V.resetHome(); dash.hidden=false; document.body.classList.add('dash-open'); }
+  function showDashboard(){ if(V.resetHome) V.resetHome(); dash.hidden=false; document.body.classList.add('dash-open'); loadTodayVisits(); }
+  async function loadTodayVisits(){
+    const el=document.getElementById('side-visits'); if(!el) return;
+    try{ const {data,error}=await sb.rpc('today_visits');
+      if(error || data==null){ el.hidden=true; return; }
+      el.textContent='오늘의 방문자 '+data+'명'; el.hidden=false;
+    }catch(_){ el.hidden=true; }
+  }
   function hideDashboard(){ dash.hidden=true; document.body.classList.remove('dash-open'); }
   function setAuthedUI(user){ loginBtn.hidden=true; signupBtn.hidden=true;
     userChip.hidden=false; userChip.textContent=user.email||'내 계정'; logoutBtn.hidden=false;

@@ -27,6 +27,23 @@ create policy visits_insert_any on public.visits
 
 grant insert on public.visits to anon, authenticated;
 
+-- ----------------------------------------------------------------------------
+-- today_visits() : 오늘(한국시간) 방문 수만 정수로 반환.
+--   - 로그인 사용자가 화면에 "오늘의 방문자 N명"을 띄우는 용도.
+--   - SECURITY DEFINER 라 방문 로그 원본은 안 열고 '합계 숫자'만 돌려준다.
+-- ----------------------------------------------------------------------------
+create or replace function public.today_visits()
+returns integer
+language sql
+security definer
+set search_path = public
+as $$
+  select count(*)::int from public.visits
+   where (created_at at time zone 'Asia/Seoul')::date = (now() at time zone 'Asia/Seoul')::date;
+$$;
+
+grant execute on function public.today_visits() to authenticated;
+
 -- ── 보는 법(사장님, SQL Editor에서) ─────────────────────────────
 --   전체 방문수:   select count(*) from public.visits;
 --   오늘:          select count(*) from public.visits where created_at >= current_date;
