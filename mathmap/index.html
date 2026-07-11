@@ -31656,34 +31656,45 @@ document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
 /* ---------- OVERVIEW ---------- */
 function drawOverview(){
  const byS={},byG={},byType={PROC:0,CONC:0,OVER:0,LANG:0};
- SALL.forEach(s=>byS[s]={skills:0,units:new Set(),reps:0,orig:0,diff:0,thr:0});
- GORD.forEach(g=>byG[g]={skills:0,reps:0});
- B.skills.forEach(s=>{const b=byS[s.strand];if(b){b.skills++;if(s.difficult)b.diff++;if(s.threshold)b.thr++;}if(byG[s.grade])byG[s.grade].skills++;});
+ SALL.forEach(s=>byS[s]={skills:0,draftSkills:0,units:new Set(),reps:0,orig:0,diff:0,thr:0});
+ GORD.forEach(g=>byG[g]={skills:0,draftSkills:0,reps:0});
+ B.skills.forEach(s=>{const b=byS[s.strand];if(b){b.skills++;if(s.status==='draft_v6')b.draftSkills++;if(s.difficult)b.diff++;if(s.threshold)b.thr++;}if(byG[s.grade]){byG[s.grade].skills++;if(s.status==='draft_v6')byG[s.grade].draftSkills++;}});
  B.catalog.forEach(c=>{const b=byS[c.strand];if(b){b.reps++;b.orig+=c.n;b.units.add(unitOf[c.skill]);}const g=skillById[c.skill]?skillById[c.skill].grade:'';if(byG[g])byG[g].reps+=1;if(c.type)byType[c.type]++;});
  const thr=B.skills.filter(s=>s.threshold);
- let h=`<div class="cards">
-  <div class="card"><div class="n">${st.units}</div><div class="l">개념 단위</div></div>
-  <div class="card"><div class="n">${st.skills}</div><div class="l">스킬</div></div>
+ const totalOrig=B.catalog.reduce((a,c)=>a+c.n,0);
+ const confirmedSkills=st.skills-(st.new_skills_v6||0);
+ const confirmedUnits=st.units-(st.new_units_v6||0);
+ const confirmedReq=st.requires-(st.draft_requires_v6||0);
+ let h=`<div class="sec"><h2>확정 범위</h2><div class="cards">
+  <div class="card"><div class="n">${confirmedUnits}</div><div class="l">개념 단위</div></div>
+  <div class="card"><div class="n">${confirmedSkills}</div><div class="l">스킬</div></div>
+  <div class="card"><div class="n">${confirmedReq}</div><div class="l">선행·후속 관계</div></div>
   <div class="card"><div class="n">${st.merged_representatives}</div><div class="l">대표 오개념</div></div>
-  <div class="card"><div class="n">1,532</div><div class="l">병합 원본(무손실)</div></div>
+  <div class="card"><div class="n">${totalOrig.toLocaleString()}</div><div class="l">병합 원본(무손실)</div></div>
   <div class="card"><div class="n">${st.difficult_skills}</div><div class="l">난개념 스킬</div></div>
   <div class="card"><div class="n">${st.threshold_candidates}</div><div class="l">핵심 후보</div></div>
-  <div class="card"><div class="n">${st.type_tagged_difficult}</div><div class="l">유형태그 부착</div></div>
-  <div class="card"><div class="n">${st.new_units_v6||0}</div><div class="l">v6 신설 단위</div></div>
-  <div class="card"><div class="n">${st.new_skills_v6||0}</div><div class="l">v6 신설 스킬</div></div>
-  <div class="card"><div class="n">${st.draft_requires_v6||0}</div><div class="l">v6 초안 선행·후속 관계</div></div>
-  <div class="card"><div class="n">${st.review_priority_high_skills||0}</div><div class="l">검수 우선순위 높음</div></div></div>`;
- h+=`<div class="sec"><h2>영역별 구성</h2><table class="g"><tr><th>영역</th><th class="num">단위</th><th class="num">스킬</th><th class="num">대표 오개념</th><th class="num">난개념 스킬</th><th class="num">핵심</th><th class="num">병합 원본</th></tr>`;
- SALL.forEach(s=>{const b=byS[s];if(!b.skills&&!b.reps)return;h+=`<tr><td><span class="badge b-strand" style="background:${SC[s]}">${B.strand_ko[s]}</span></td><td class="num">${b.units.size||'-'}</td><td class="num">${b.skills}</td><td class="num">${b.reps}</td><td class="num">${b.diff}</td><td class="num">${b.thr}</td><td class="num">${b.orig}</td></tr>`});
- h+=`<tr><th>합계</th><th class="num">${st.units}</th><th class="num">${st.skills}</th><th class="num">${st.merged_representatives}</th><th class="num">${st.difficult_skills}</th><th class="num">${st.threshold_candidates}</th><th class="num">1,532</th></tr></table></div>`;
- h+=`<div class="sec"><h2>학년별 구성</h2><table class="g"><tr><th>학년</th><th class="num">스킬</th><th class="num">대표 오개념</th></tr>`;
- GORD.forEach(g=>{h+=`<tr><td>${B.grade_ko[g]}</td><td class="num">${byG[g].skills}</td><td class="num">${byG[g].reps}</td></tr>`});h+=`</table></div>`;
- h+=`<div class="sec"><h2>오개념 유형 분포 (난개념 대표 124)</h2><table class="g"><tr><th>유형</th><th class="num">개수</th><th>처방 방향</th></tr>`;
+  <div class="card"><div class="n">${st.type_tagged_difficult}</div><div class="l">유형태그 부착</div></div></div></div>`;
+ h+=`<div class="sec"><h2>v6 신설 (초안 — 교사 검수 전)</h2><div class="cards">
+  <div class="card"><div class="n">${st.new_units_v6||0}</div><div class="l">신설 단위</div></div>
+  <div class="card"><div class="n">${st.new_skills_v6||0}</div><div class="l">신설 스킬</div></div>
+  <div class="card"><div class="n">${st.draft_requires_v6||0}</div><div class="l">초안 관계</div></div>
+  <div class="card"><div class="n">${st.review_priority_high_skills||0}</div><div class="l">검수 우선순위 높음</div></div></div>
+  <div class="small">신설 항목은 개념지도·관계망에서 <b>점선 테두리</b>로, 검수 우선순위 높음은 <b>노란 "검수필요" 배지</b>로 표시됩니다.</div></div>`;
+ h+=`<div class="sec"><h2>전체 규모 (확정+초안)</h2><table class="g"><tr><th></th><th class="num">합계</th><th class="num">확정</th><th class="num">v6 신설(초안)</th></tr>
+  <tr><td>개념 단위</td><td class="num">${st.units}</td><td class="num">${confirmedUnits}</td><td class="num">${st.new_units_v6||0}</td></tr>
+  <tr><td>스킬</td><td class="num">${st.skills}</td><td class="num">${confirmedSkills}</td><td class="num">${st.new_skills_v6||0}</td></tr>
+  <tr><td>선행·후속 관계</td><td class="num">${st.requires}</td><td class="num">${confirmedReq}</td><td class="num">${st.draft_requires_v6||0}</td></tr></table></div>`;
+ h+=`<div class="sec"><h2>영역별 구성</h2><table class="g"><tr><th>영역</th><th class="num">단위</th><th class="num">스킬</th><th class="num">초안</th><th class="num">대표 오개념</th><th class="num">난개념</th><th class="num">핵심</th><th class="num">병합 원본</th></tr>`;
+ SALL.forEach(s=>{const b=byS[s];if(!b.skills&&!b.reps)return;h+=`<tr><td><span class="badge b-strand" style="background:${SC[s]}">${B.strand_ko[s]}</span></td><td class="num">${b.units.size||'-'}</td><td class="num">${b.skills}</td><td class="num">${b.draftSkills||'-'}</td><td class="num">${b.reps}</td><td class="num">${b.diff}</td><td class="num">${b.thr}</td><td class="num">${b.orig}</td></tr>`});
+ h+=`<tr><th>합계</th><th class="num">${st.units}</th><th class="num">${st.skills}</th><th class="num">${st.new_skills_v6||0}</th><th class="num">${st.merged_representatives}</th><th class="num">${st.difficult_skills}</th><th class="num">${st.threshold_candidates}</th><th class="num">${totalOrig.toLocaleString()}</th></tr></table></div>`;
+ h+=`<div class="sec"><h2>학년별 구성</h2><table class="g"><tr><th>학년</th><th class="num">스킬</th><th class="num">초안</th><th class="num">대표 오개념</th></tr>`;
+ GORD.forEach(g=>{h+=`<tr><td>${B.grade_ko[g]}</td><td class="num">${byG[g].skills}</td><td class="num">${byG[g].draftSkills||'-'}</td><td class="num">${byG[g].reps}</td></tr>`});h+=`</table></div>`;
+ h+=`<div class="sec"><h2>오개념 유형 분포 (난개념 대표 ${st.type_tagged_difficult})</h2><table class="g"><tr><th>유형</th><th class="num">개수</th><th>처방 방향</th></tr>`;
  const rx={PROC:'연습·단계 점검',CONC:'개념 재구성',OVER:'반례 제시',LANG:'표기 규약 재확인'};
  Object.keys(byType).forEach(t=>{h+=`<tr><td>${B.type_ko[t]} <span class="small">(${t})</span></td><td class="num">${byType[t]}</td><td>${rx[t]}</td></tr>`});h+=`</table></div>`;
  h+=`<div class="sec"><h2>핵심개념 후보 (교사 확정 대상)</h2><table class="g"><tr><th>스킬</th><th>학년</th><th>근거</th></tr>`;
  thr.forEach(s=>{h+=`<tr><td>${s.label}</td><td>${B.grade_ko[s.grade]}</td><td class="small">${s.threshold_rationale||''}</td></tr>`});h+=`</table></div>`;
- h+=`<div class="note">숫자만으로 초안 규모를 잡는 페이지입니다. 구조는 <b>개념지도</b>, 오개념 상세는 <b>오개념·난개념</b>, 집중·공백 분포는 <b>전체 형태</b>에서 확인하세요. v6에서 신설된 스킬 ${st.new_skills_v6||0}개(단위 ${st.new_units_v6||0}개)와 초안 선행·후속 관계 ${st.draft_requires_v6||0}개는 점선 테두리로 표시되며 교사 검수 전입니다.</div>`;
+ h+=`<div class="note">규모 감각을 잡는 페이지입니다. 구조는 <b>개념지도</b>, 오개념 상세는 <b>오개념·난개념</b>, 집중·공백 분포는 <b>전체 형태</b>에서 확인하세요.</div>`;
  document.getElementById('p-ov').innerHTML=h;
 }
 
@@ -31701,8 +31712,7 @@ function drawMap(){
  // group skills by strand+grade
  const byСG={};SORD.forEach(s=>{byСG[s]={};GORD.forEach(g=>byСG[s][g]=[])});
  B.skills.forEach(s=>{if(byСG[s.strand]&&byСG[s.strand][s.grade])byСG[s.strand][s.grade].push(s)});
- // columns per strand: use 3 columns if any grade band for that strand has more than 6 skills
- const colsOf={};SORD.forEach(s=>{let mx=0;GORD.forEach(g=>{mx=Math.max(mx,byСG[s][g].length)});colsOf[s]=mx>6?3:2;});
+ const colsOf={NUM:3,REL:2,GEO:2,DATA:1};
  // band heights: max over strands of ceil(count/cols)
  const bandRows={},bandY={};let cy=padT;
  GORD.forEach(g=>{let mx=1;SORD.forEach(s=>{mx=Math.max(mx,Math.ceil(byСG[s][g].length/colsOf[s]))});bandRows[g]=mx;bandY[g]=cy;cy+=mx*rowH+10});
@@ -31844,6 +31854,7 @@ function drawTree(){
 /* ---------- PROV ---------- */
 function renderProv(){
  const p=B.provenance,pv=[];
+ const totalOrig=B.catalog.reduce((a,c)=>a+c.n,0);
  const order=[['misconceptions_eedi','오개념 — Eedi'],['misconceptions_algebra55','오개념 — algebra 55(seed)'],['concept_and_prerequisites','개념·선행관계'],['standards','성취기준'],['authored_korean_layer','자체 작성 한국어층']];
  order.forEach(([k,t])=>{const o=p[k];if(!o)return;pv.push(`<div class="prov"><h3>${t}</h3><div>${o.source||''}</div>${o.url?`<div class="small">${o.url}</div>`:''}${o.count?`<div class="small">규모: ${o.count}</div>`:''}${o.license?`<div class="lic">⚠ ${o.license}</div>`:''}${o.note?`<div class="small">${o.note}</div>`:''}</div>`)});
  const cl=B.changelog.map(c=>`<div class="prov"><h3>${c.version} · ${c.date}</h3><ul style="margin:4px 0 0;padding-left:18px">${c.changes.map(x=>`<li>${x}</li>`).join('')}</ul>${c.note?`<div class="small" style="margin-top:4px">${c.note}</div>`:''}</div>`).join('');
@@ -31852,18 +31863,18 @@ function renderProv(){
  <div class="sec"><h2>가공 파이프라인</h2><div class="pipe">
   <span class="st">원자료<br><b>Eedi 1,152 · FR 75 · algebra 55</b></span><span class="a">→</span>
   <span class="st">한글 번역<br><b>교사용 톤</b></span><span class="a">→</span>
-  <span class="st">유사 병합<br><b>1,152→대표 256</b></span><span class="a">→</span>
-  <span class="st">난개념 2층<br><b>난 31·핵심 10</b></span><span class="a">→</span>
-  <span class="st">유형태그<br><b>난개념 124</b></span><span class="a">→</span>
+  <span class="st">유사 병합<br><b>${totalOrig.toLocaleString()}→대표 ${st.merged_representatives}</b></span><span class="a">→</span>
+  <span class="st">난개념 2층<br><b>난 ${st.difficult_skills}·핵심 ${st.threshold_candidates}</b></span><span class="a">→</span>
+  <span class="st">유형태그<br><b>난개념 ${st.type_tagged_difficult}</b></span><span class="a">→</span>
   <span class="st">v6 신설<br><b>단위 ${st.new_units_v6||0}·스킬 ${st.new_skills_v6||0}·관계 ${st.draft_requires_v6||0}(초안)</b></span></div>
   <div class="small">원본은 오개념_원본추적.csv에 무손실 보관. MaE seed ${B.mae_seed}개 교차연결 대기.</div></div>
  <div class="sec"><h2>버전 이력</h2>${cl}</div>
  <div class="sec"><h2>출처 · 라이선스</h2>${pv.join('')}</div>
  <div class="sec"><h2>예상 진단 문항 규모</h2>
-  <div class="note">투명 모델 — 대표 오개념마다 진단 문항 <b id="dval">3</b>개 가정. 최소=대표 기반, 최대 다양성=병합 원본(1,532종).</div>
+  <div class="note">투명 모델 — 대표 오개념마다 진단 문항 <b id="dval">3</b>개 가정. 최소=대표 기반, 최대 다양성=병합 원본(${totalOrig.toLocaleString()}종).</div>
   <div class="slider">오개념당 문항 <input type="range" id="dslider" min="1" max="6" value="3"><span id="dval2">3</span>개</div>
   <table class="g"><tr><th>영역</th><th class="num">대표</th><th class="num">예상 문항(대표×n)</th><th class="num">원본 최대</th></tr><tbody id="volbody"></tbody>
-  <tr><th>합계</th><th class="num" id="vt1"></th><th class="num" id="vt2"></th><th class="num">1,532</th></tr></table></div>`;
+  <tr><th>합계</th><th class="num" id="vt1"></th><th class="num" id="vt2"></th><th class="num">${totalOrig.toLocaleString()}</th></tr></table></div>`;
  function vol(){const d=+document.getElementById('dslider').value;document.getElementById('dval').textContent=d;document.getElementById('dval2').textContent=d;let t1=0,t2=0;
   document.getElementById('volbody').innerHTML=SORD.concat(['']).map(s=>{const n=byStrand[s]||0;if(!n)return'';const orig=B.catalog.filter(c=>c.strand===s).reduce((a,c)=>a+c.n,0);t1+=n;t2+=n*d;return `<tr><td>${B.strand_ko[s]}</td><td class="num">${n}</td><td class="num">${n*d}</td><td class="num">${orig}</td></tr>`}).join('');
   document.getElementById('vt1').textContent=t1;document.getElementById('vt2').textContent=t2;}
@@ -31880,6 +31891,7 @@ function dlJSON(which){
 window.dlJSON=dlJSON;
 function renderHelp(){
  const st=B.stats;
+ const totalOrig=B.catalog.reduce((a,c)=>a+c.n,0);
  document.getElementById('p-help').innerHTML=`<div class="doc">
  <div class="sec"><h2>1. 이 자료는 무엇이고, 왜 만들었나</h2>
  <p>공교육 기초학력의 핵심 과제는 <b>결손 역추적</b>입니다 — 학생이 지금 어디서 막혔는지 찾아, 그 앞의 개념으로 <b>되돌려 보내</b> 다시 배우게 하는 것. 그래서 이 데이터는 단순 목차(트리)가 아니라, 초1~중2 수학을 <b>영역 → 개념단위 → 스킬</b>의 3층으로 나누고 그 사이를 네 가지 관계로 엮은 <b>지도</b>입니다.</p>
@@ -31906,11 +31918,11 @@ function renderHelp(){
  <div class="pipe">
   <span class="st">① 원자료<br><b>Eedi 1,152 · FenRivers 75 · algebra 55</b></span><span class="a">→</span>
   <span class="st">② 한글 번역<br><b>교사용 톤·국내 용어</b></span><span class="a">→</span>
-  <span class="st">③ 유사 병합<br><b>1,152 → 대표 256 (스킬당 ≤5)</b></span><span class="a">→</span>
-  <span class="st">④ 난개념 2층<br><b>난개념 31 · 핵심개념 후보 10</b></span><span class="a">→</span>
-  <span class="st">⑤ 유형태그<br><b>난개념 대표 124</b></span><span class="a">→</span>
+  <span class="st">③ 유사 병합<br><b>${totalOrig.toLocaleString()} → 대표 ${st.merged_representatives} (스킬당 ≤5)</b></span><span class="a">→</span>
+  <span class="st">④ 난개념 2층<br><b>난개념 ${st.difficult_skills} · 핵심개념 후보 ${st.threshold_candidates}</b></span><span class="a">→</span>
+  <span class="st">⑤ 유형태그<br><b>난개념 대표 ${st.type_tagged_difficult}</b></span><span class="a">→</span>
   <span class="st">⑥ 관계·병목<br><b>선행·후속 계보</b></span></div>
- <p class="small">원본 오개념 1,532종은 <b>무손실로 추적</b>됩니다(오개념_원본추적.csv). 대표 문구가 과하게 뭉쳤다고 판단되면 언제든 원본을 되살려 다시 나눌 수 있습니다.</p></div>
+ <p class="small">원본 오개념 ${totalOrig.toLocaleString()}종은 <b>무손실로 추적</b>됩니다(오개념_원본추적.csv). 대표 문구가 과하게 뭉쳤다고 판단되면 언제든 원본을 되살려 다시 나눌 수 있습니다.</p></div>
 
  <div class="sec"><h2>5. 병합·분류 규칙</h2>
  <div class="gloss"><b>병합 — 맥락은 하나로.</b> 같은 인지오류는 맥락이 달라도 1개로 병합합니다(“자연수/분수/소수를 곱하면 커진다” → “곱하면 항상 커진다고 생각함” 하나). 병합 시 가장 명확한 <b>대표 문구 1개</b>를 고르고, 흡수된 <b>원본 ID·예시 수</b>를 함께 보존합니다.</div>
@@ -31946,7 +31958,7 @@ function renderHelp(){
  <tr><td>핵심개념</td><td>못 넘으면 뒤가 막히는 전환적 개념(교사 확정)</td><td>threshold</td><td>관문개념</td></tr>
  <tr><td>유형태그</td><td>오개념 성격 4분류(PROC/CONC/OVER/LANG)</td><td>mc_type</td><td>—</td></tr>
  <tr><td>대표 오개념(${st.merged_representatives})</td><td>원본을 스킬당 ≤5로 병합한 대표</td><td>MG###·catalog</td><td>—</td></tr>
- <tr><td>병합 원본(1,532)</td><td>대표에 병합된 개별 원본(무손실)</td><td>orig·sources</td><td>—</td></tr></table>
+ <tr><td>병합 원본(${totalOrig.toLocaleString()})</td><td>대표에 병합된 개별 원본(무손실)</td><td>orig·sources</td><td>—</td></tr></table>
  <p class="small">v6부터 뷰어 화면의 버튼·뱃지·안내문도 통일된 새 용어(핵심·보정 연결·선행·후속)로 맞췄습니다. <b>이전 표현</b>(관문·교정 회귀·선수·이후)은 옛 자료·CSV 등에 남아있을 수 있으며 위 표로 대응됩니다. <b>데이터 필드명(영문)은 바꾸지 않습니다.</b></p></div>
 
  <div class="note">모든 번역·병합 대표·난개념·핵심개념·유형태그는 <b>교사 검수 전 초안</b>입니다. 난개념 판정은 오답률 없이 오개념 밀도·문헌으로 잡은 잠정치이며, 실증·사내 오답 데이터로 교체 예정입니다.</div>
